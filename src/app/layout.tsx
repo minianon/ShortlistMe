@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   ),
 };
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -35,7 +37,7 @@ export default function RootLayout({
       <html
         lang="en"
         className={`${manrope.variable} ${inter.variable} h-full`}
-        data-scroll-behavior="smooth"
+        suppressHydrationWarning
         style={
           {
             "--font-display": "var(--font-manrope)",
@@ -43,7 +45,9 @@ export default function RootLayout({
           } as React.CSSProperties
         }
       >
-        <body className="min-h-full flex flex-col antialiased">{children}</body>
+        <body className="min-h-full flex flex-col antialiased">
+          <ThemeProvider>{children}</ThemeProvider>
+        </body>
       </html>
     </ClerkProvider>
   );
