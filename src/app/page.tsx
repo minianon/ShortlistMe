@@ -135,11 +135,18 @@ export default function HomePage() {
               {/* Main Content Area */}
               <div className="flex-1 relative flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#111111] to-[#0a0a0a]">
                 
-                {/* Scene 1: AI Processing Center */}
-                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                  <div className="absolute w-16 h-16 rounded-full border border-emerald-500/30 animate-[heroAiPulse_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
-                  <div className="absolute w-16 h-16 rounded-full border border-emerald-500/30 animate-[heroAiPulse_6s_infinite_cubic-bezier(0.25,1,0.5,1)] [animation-delay:0.2s]"></div>
-                  <div className="absolute w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_20px_#10b981] animate-[heroPulseCenter_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
+                {/* Scene 1: Resume Upload & AI Parsing */}
+                <div className="absolute w-24 h-32 bg-white/[0.03] border border-white/10 rounded-lg top-1/2 left-1/2 flex flex-col gap-2.5 p-3 opacity-0 animate-[heroResumePulse_6s_infinite_cubic-bezier(0.25,1,0.5,1)] z-10 pointer-events-none shadow-2xl backdrop-blur-sm">
+                   {/* Resume Lines */}
+                   <div className="w-1/2 h-2 bg-emerald-500/50 rounded-full mb-1"></div>
+                   <div className="w-full h-1.5 bg-white/20 rounded-full"></div>
+                   <div className="w-full h-1.5 bg-white/20 rounded-full"></div>
+                   <div className="w-4/5 h-1.5 bg-white/20 rounded-full"></div>
+                   <div className="mt-auto w-full h-8 bg-white/5 rounded block border border-white/10"></div>
+                   
+                   {/* Scanning Rings Overlay */}
+                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-emerald-500/40 animate-[heroAiPulse_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
+                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_25px_#10b981] animate-[heroPulseCenter_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
                 </div>
 
                 {/* Scene 2: Portfolio UI Build - Fades In */}
