@@ -1,12 +1,12 @@
 # ShortlistMe
 
+
 ## Overview
 ShortlistMe is a web platform that helps users instantly create a professional portfolio from their resume or basic details.
 
 Instead of spending hours designing and writing a portfolio, users can simply upload their resume or fill in their details, and ShortlistMe will generate a clean, shareable portfolio for them.
 
 ---
-
 ## Problem We Are Solving
 Creating a portfolio can be:
 - Time-consuming  
@@ -79,7 +79,7 @@ This helps users focus on their skills instead of design and setup.
 ---
 
 ## Current Status
-In development (MVP phase)
+In development(MVP phase)
 
 ---
 
