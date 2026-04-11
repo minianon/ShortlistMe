@@ -78,7 +78,7 @@ This helps users focus on their skills instead of design and setup.
 ---
 
 ## Current Status
-In development (MVP phase)
+In development(MVP phase)
 
 ---
 
