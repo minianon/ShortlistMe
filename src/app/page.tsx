@@ -1,37 +1,81 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Sparkles, Check, Zap, Sliders, Palette, Share, UploadCloud, CheckCircle, ChevronDown, BarChart3, Globe, Search, TrendingUp } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function HomePage() {
   const [activeStep, setActiveStep] = useState(1);
+  const [isTeamCanvasOpen, setIsTeamCanvasOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [progress, setProgress] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 1. Timer: Handles the 0-100% steady count
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 100 : prev + 2));
+    }, 100);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  // 2. Step Logic: Handles transitioning when progress hits 100%
+  useEffect(() => {
+    if (progress >= 100) {
+      const timeout = setTimeout(() => {
+        setActiveStep((curr) => (curr === 3 ? 1 : curr + 1));
+        setProgress(0);
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [progress]);
+
+  const handleStepClick = (id: number) => {
+    setActiveStep(id);
+    setProgress(0);
+  };
+
+  const VideoCard = ({ src, className = "" }: { src: string; className?: string }) => (
+    <div className={`relative w-full h-full overflow-hidden rounded-2xl border border-border-strong/10 bg-black/5 ${className}`}>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply group-hover:opacity-100 transition-opacity duration-700"
+      >
+        <source src={src} type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 bg-gradient-to-t from-background-secondary/10 via-transparent to-transparent"></div>
+    </div>
+  );
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-[#f7f9fb] text-[#191c1e] font-sans selection:bg-[#4f46e5] selection:text-white">
+    <div className="min-h-[100dvh] flex flex-col bg-background-secondary text-text font-sans selection:bg-primary selection:text-white">
+
       {/* ── Navigation ── */}
-      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-md border-b border-gray-200/50">
+      <header className="sticky top-0 z-50 bg-background/70 backdrop-blur-md border-b border-border-strong/50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link
               href="/"
               style={{ fontFamily: "var(--font-display)" }}
-              className="font-extrabold text-xl tracking-tight text-[#191c1e]"
+              className="font-extrabold text-xl tracking-tight text-text"
             >
               ShortlistMe
             </Link>
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-500">
-              <Link href="#" className="hover:text-[#191c1e] transition-colors">Features</Link>
-              <Link href="#" className="hover:text-[#191c1e] transition-colors">Pricing</Link>
-              <Link href="#" className="hover:text-[#191c1e] transition-colors">Showcase</Link>
-            </nav>
           </div>
           <div className="flex items-center gap-4">
-            <button className="hidden sm:flex text-gray-400 hover:text-[#191c1e] transition-colors">
-              <span className="material-symbols-rounded text-xl">dark_mode</span>
-            </button>
+            <div className="hidden sm:flex text-text-muted hover:text-text transition-colors">
+              <ThemeToggle />
+            </div>
             <Link
               href="/sign-up"
-              className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-[0_4px_14px_0_rgba(79,70,229,0.39)]"
+              className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-[0_4px_14px_0_rgba(79,70,229,0.39)]"
             >
               Get Started
             </Link>
@@ -43,57 +87,57 @@ export default function HomePage() {
         {/* ── Hero Section ── */}
         <section className="py-20 md:py-28 flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#eef2ff] text-[#4f46e5] rounded-full text-xs font-bold uppercase tracking-wide mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-light text-primary rounded-full text-xs font-bold uppercase tracking-wide mb-6">
               AI-Powered Portfolios in a Snap
             </div>
             <h1
               style={{ fontFamily: "var(--font-display)" }}
-              className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 text-[#191c1e]"
+              className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 text-text"
             >
-              Turn Your Resume Into a <span className="text-[#4f46e5]">Portfolio</span> in Seconds
+              Turn Your Resume Into a <span className="text-primary">Portfolio</span> in Seconds
             </h1>
-            <p className="text-lg md:text-xl text-gray-500 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-lg md:text-xl text-text-secondary mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Upload your resume or enter your details manually, and we'll generate a professional, high-fidelity portfolio instantly. Share your best work with recruiters and clients.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <Link
                 href="/sign-up"
-                className="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-8 py-3.5 rounded-xl text-[15px] font-semibold transition-all shadow-lg shadow-indigo-500/25 w-full sm:w-auto text-center"
+                className="bg-primary hover:bg-primary-dark text-white px-8 py-3.5 rounded-xl text-[15px] font-semibold transition-all shadow-lg shadow-primary/25 w-full sm:w-auto text-center"
               >
                 Get Started
               </Link>
-              <Link
-                href="#"
-                className="bg-gray-100 hover:bg-gray-200 text-[#191c1e] px-8 py-3.5 rounded-xl text-[15px] font-semibold transition-all w-full sm:w-auto text-center"
+              <a
+                href="#features"
+                className="bg-background-tertiary hover:bg-border-strong text-text px-8 py-3.5 rounded-xl text-[15px] font-semibold transition-all w-full sm:w-auto text-center"
               >
-                View Demo
-              </Link>
+                See Features &gt;
+              </a>
             </div>
           </div>
           <div className="flex-1 w-full max-w-lg mx-auto lg:max-w-none relative">
-            <div className="aspect-square md:aspect-[4/3] rounded-3xl bg-gradient-to-br from-white to-indigo-50/50 shadow-2xl shadow-indigo-100 border border-white/50 p-6 flex flex-col relative overflow-hidden">
+            <div className="aspect-square md:aspect-[4/3] rounded-3xl bg-gradient-to-br from-white to-indigo-50/50 shadow-2xl shadow-indigo-100 border border-background/50 p-6 flex flex-col relative overflow-hidden">
               {/* Graphic Mockup inside Hero */}
-              <div className="w-full h-4 bg-gray-100 rounded-full mb-8 relative overflow-hidden">
-                <div className="absolute inset-y-0 left-0 bg-indigo-100 w-1/3 rounded-full"></div>
+              <div className="w-full h-4 bg-background-tertiary rounded-full mb-8 relative overflow-hidden">
+                <div className="absolute inset-y-0 left-0 bg-primary-light w-1/3 rounded-full"></div>
               </div>
               <div className="flex-1 flex items-center justify-center relative">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--primary-fixed)_0%,transparent_70%)] opacity-20 blur-3xl"></div>
                 {/* Concentric rings */}
-                <div className="w-64 h-64 border border-indigo-100 rounded-full absolute"></div>
-                <div className="w-48 h-48 border border-indigo-200 rounded-full absolute"></div>
+                <div className="w-64 h-64 border border-primary-light rounded-full absolute"></div>
+                <div className="w-48 h-48 border border-primary-light rounded-full absolute"></div>
                 <div className="w-32 h-32 border border-indigo-300 rounded-full absolute"></div>
-                <div className="w-16 h-16 bg-white rounded-full shadow-lg shadow-indigo-200 flex items-center justify-center relative z-10">
-                  <span className="material-symbols-rounded text-indigo-500">auto_awesome</span>
+                <div className="w-16 h-16 bg-background rounded-full shadow-lg shadow-indigo-200 flex items-center justify-center relative z-10">
+                  <Sparkles className="w-5 h-5 text-primary" />
                 </div>
               </div>
               {/* Floating Badge */}
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border border-gray-100 flex items-center gap-3">
+              <div className="absolute -bottom-6 -left-6 bg-background rounded-2xl p-4 shadow-xl border border-border flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                  <span className="material-symbols-rounded text-sm font-bold">check</span>
+                  <Check className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-900">Portfolio Ready</p>
-                  <p className="text-xs text-gray-500">Generated in 4.2s</p>
+                  <p className="text-sm font-bold text-text">Portfolio Ready</p>
+                  <p className="text-xs text-text-secondary">Generated in 4.2s</p>
                 </div>
               </div>
             </div>
@@ -101,77 +145,292 @@ export default function HomePage() {
         </section>
 
         {/* ── Features Section ── */}
-        <section className="py-24">
+        <section id="features" className="py-24 scroll-mt-24">
           <div className="mb-14">
             <h2
               style={{ fontFamily: "var(--font-display)" }}
-              className="text-3xl md:text-4xl font-bold tracking-tight text-[#191c1e] mb-4"
+              className="text-3xl md:text-4xl font-bold tracking-tight text-text mb-4"
             >
               Powerful features for modern careers
             </h2>
-            <p className="text-gray-500 max-w-2xl text-lg">
+            <p className="text-text-secondary max-w-2xl text-lg">
               Everything you need to stand out in a crowded market, powered by our custom curation engine.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {/* Feature 1 - Spans 7 */}
-            <div className="md:col-span-7 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-8 items-center overflow-hidden group">
+            {/* 1. Instant Generation (8/12) */}
+            <div className="md:col-span-8 bg-background p-10 rounded-[2.5rem] shadow-sm border border-border flex flex-col lg:flex-row gap-10 items-center overflow-hidden group">
               <div className="flex-1">
-                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mb-6">
-                  <span className="material-symbols-rounded">bolt</span>
+                <div className="w-12 h-12 rounded-2xl bg-primary-light flex items-center justify-center text-primary mb-6 transition-transform group-hover:scale-110 group-hover:rotate-3 shadow-sm">
+                  <Zap className="w-6 h-6 fill-current" />
                 </div>
-                <h3 className="text-xl font-bold mb-3">Instant Generation</h3>
-                <p className="text-gray-500 leading-relaxed text-sm">
-                  Our AI parses your resume and maps it to a high-fidelity design system in under 10 seconds. No manual formatting required.
+                <h3 className="text-2xl font-extrabold mb-4">Instant Generation</h3>
+                <p className="text-text-secondary leading-relaxed mb-6">
+                   Turn a static resume into a high-fidelity professional site in under 10 seconds.
+                </p>
+                <div className="flex gap-2">
+                  <div className="px-3 py-1 bg-background-tertiary rounded-full text-[10px] font-bold text-text-muted uppercase tracking-wider">Neural Engine v2</div>
+                  <div className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Fast-Sync</div>
+                </div>
+              </div>
+              <div className="flex-1 w-full lg:w-auto h-72 relative bg-background-secondary rounded-3xl border border-border-strong/10 p-0 overflow-hidden shadow-inner">
+                {/* Animation Container */}
+                <div className="absolute inset-0 flex flex-col animate-instant-gen h-[300%]">
+                  {/* Step 1: Uploading */}
+                  <div className="h-1/3 w-full flex flex-col items-center justify-center bg-background-secondary gap-4">
+                    <div className="w-16 h-20 bg-background rounded-lg border-2 border-dashed border-primary/40 flex items-center justify-center relative overflow-hidden group-hover:border-primary transition-colors">
+                      <UploadCloud className="w-8 h-8 text-primary animate-bounce" />
+                      <div className="absolute inset-x-0 bottom-0 h-1 bg-primary animate-[uploadProgress_4s_linear_infinite]"></div>
+                    </div>
+                    <div className="text-xs font-black text-primary tracking-widest uppercase">Initializing Parse...</div>
+                  </div>
+
+                  {/* Step 2: High-Fidelity AI Analysis (SVG Network) */}
+                  <div className="h-1/3 w-full flex flex-col items-center justify-center bg-background p-6 gap-2 relative">
+                    <svg viewBox="0 0 100 60" className="w-48 h-32 overflow-visible">
+                      <g className="text-primary/20">
+                         {/* Connection Lines */}
+                         <path d="M20,30 L50,15 M20,30 L50,45 M50,15 L80,30 M50,45 L80,30" stroke="currentColor" strokeWidth="1" className="animate-flow" />
+                      </g>
+                      {/* Pulse Nodes */}
+                      <circle cx="20" cy="30" r="4" className="fill-primary animate-node" />
+                      <circle cx="50" cy="15" r="3" className="fill-primary/60 animate-node" style={{ animationDelay: '0.4s' }} />
+                      <circle cx="50" cy="45" r="3" className="fill-primary/60 animate-node" style={{ animationDelay: '0.8s' }} />
+                      <circle cx="80" cy="30" r="4" className="fill-primary animate-node" style={{ animationDelay: '1.2s' }} />
+                    </svg>
+                    <div className="text-[10px] font-mono font-bold text-text-muted text-center max-w-[140px] leading-tight mt-2">
+                       Extracting Key Expertise & Narratives...
+                    </div>
+                  </div>
+
+                  {/* Step 3: Portfolio Preview Launch */}
+                  <div className="h-1/3 w-full bg-background p-4 relative">
+                    <div className="w-full h-full rounded-xl border border-primary/20 bg-background-secondary shadow-2xl flex flex-col overflow-hidden relative group/mock">
+                      {/* Browser Mockup */}
+                      <div className="h-6 bg-border/30 flex items-center px-3 justify-between border-b border-border/50">
+                        <div className="flex gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-rose-400"></div>
+                          <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
+                        </div>
+                        <div className="w-32 h-2 bg-white/50 rounded-full"></div>
+                      </div>
+                      <div className="flex-1 p-3 flex flex-col gap-3">
+                         <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-primary/20"></div>
+                            <div className="space-y-1">
+                               <div className="w-16 h-2 bg-text opacity-10 rounded"></div>
+                               <div className="w-10 h-1.5 bg-text opacity-5 rounded"></div>
+                            </div>
+                         </div>
+                         <div className="w-full h-12 bg-primary/10 rounded-lg flex flex-col gap-1.5 p-2 border border-primary/5">
+                            <div className="w-3/4 h-1.5 bg-primary/40 rounded"></div>
+                            <div className="w-full h-1 bg-primary/10 rounded"></div>
+                         </div>
+                      </div>
+                      <div className="absolute top-8 right-3 bg-emerald-500 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg animate-pulse">SITE ONLINE</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Real-time Analytics (4/12) */}
+            <div className="md:col-span-4 bg-background p-10 rounded-[2.5rem] shadow-sm border border-border flex flex-col group overflow-hidden relative">
+              <div className="relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 border border-emerald-100 transition-transform group-hover:scale-110">
+                  <BarChart3 className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-extrabold mb-4">Live Analytics</h3>
+                <p className="text-text-secondary leading-relaxed mb-6">
+                  Track all visitor engagement and reach in real-time.
                 </p>
               </div>
-              <div className="flex-1 w-full sm:w-auto h-40 bg-gray-50 rounded-xl border border-gray-100 relative group-hover:scale-105 transition-transform duration-500 p-4">
-                 <div className="w-3/4 h-3 bg-gray-200 rounded-full mb-3"></div>
-                 <div className="w-1/2 h-3 bg-gray-200 rounded-full mb-6"></div>
-                 <div className="w-full h-2 bg-gray-200 rounded-full mb-2"></div>
-                 <div className="w-full h-2 bg-gray-200 rounded-full mb-2"></div>
-                 <div className="w-4/5 h-2 bg-gray-200 rounded-full"></div>
+              <div className="mt-auto relative z-10 flex flex-col gap-4">
+                <div className="text-4xl font-black text-emerald-600 tabular-nums flex items-baseline gap-1">
+                  <span className="animate-count"></span>
+                  <span className="text-lg opacity-50">+</span>
+                </div>
+                
+                {/* SVG Area Chart - Synced Growth */}
+                <div className="relative h-24 w-full">
+                  <svg viewBox="0 0 100 40" className="w-full h-full overflow-visible drop-shadow-[0_8px_16px_rgba(16,185,129,0.15)]">
+                    <defs>
+                      <linearGradient id="syncGraphGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <g className="analytics-graph-sync">
+                      {/* Fill Area */}
+                      <path
+                        d="M0 40 Q 15 35, 25 20 T 45 15 T 65 25 T 85 5 T 100 10 L 100 40 L 0 40 Z"
+                        fill="url(#syncGraphGradient)"
+                      />
+                      {/* Stroke Line */}
+                      <path
+                        d="M0 40 Q 15 35, 25 20 T 45 15 T 65 25 T 85 5 T 100 10"
+                        fill="none"
+                        stroke="#10b981"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+                    </g>
+                  </svg>
+                  {/* Glowing Point at the end of the reveal - Synced */}
+                  <div className="absolute top-[8px] right-0 w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_12px_#10b981] analytics-graph-sync"></div>
+                </div>
               </div>
             </div>
 
-            {/* Feature 2 - Spans 5 */}
-            <div className="md:col-span-5 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 group">
-              <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 mb-6">
-                <span className="material-symbols-rounded">tune</span>
+            {/* 3. High Customization (7/12) */}
+            <div className="md:col-span-12 lg:col-span-7 bg-background p-10 rounded-[2.5rem] shadow-sm border border-border group overflow-hidden relative flex flex-col lg:flex-row gap-8 items-center">
+              <div className="flex-1">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 border border-indigo-100 transition-transform group-hover:rotate-6 shadow-sm">
+                  <Sliders className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-extrabold mb-4">Pixel Perfection</h3>
+                <p className="text-text-secondary leading-relaxed mb-6">
+                  Tweak every detail of your website theme, color, and layout in real-time.
+                </p>
+                {/* Simulated Color Slider - Synced */}
+                <div className="w-full h-8 rounded-full bg-gradient-to-r from-primary via-indigo-500 to-rose-500 relative flex items-center cursor-default group/slider mb-6">
+                  <div className="w-6 h-6 bg-white rounded-full shadow-lg border-2 border-border theme-dot-sync"></div>
+                </div>
               </div>
-              <h3 className="text-xl font-bold mb-3">High Customization</h3>
-              <p className="text-gray-500 leading-relaxed text-sm mb-6">
-                Tweak layouts, colors, and typography to match your personal brand perfectly.
-              </p>
-            </div>
-
-            {/* Feature 3 - Spans 4 */}
-            <div className="md:col-span-4 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 group">
-              <div className="w-10 h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-600 mb-6">
-                <span className="material-symbols-rounded">contrast</span>
-              </div>
-              <h3 className="text-xl font-bold mb-3">Dark/Light Support</h3>
-              <p className="text-gray-500 leading-relaxed text-sm">
-                Every portfolio comes with native dark and light mode support built in.
-              </p>
-            </div>
-
-            {/* Feature 4 - Spans 8 */}
-            <div className="md:col-span-8 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col sm:flex-row justify-between gap-6 group">
-               <div>
-                  <div className="w-10 h-10 rounded-full bg-fuchsia-50 flex items-center justify-center text-fuchsia-600 mb-6">
-                    <span className="material-symbols-rounded">ios_share</span>
+              <div className="flex-1 w-full h-64 relative bg-background-tertiary/20 rounded-3xl border border-border p-4 overflow-hidden">
+                {/* Website Theme Mockup - Synced */}
+                {/* The theme-mockup-sync class animates the 'color' property, which children inherit via text-current, bg-current, etc. */}
+                <div className="w-full h-full rounded-2xl bg-background border border-border shadow-2xl p-5 flex flex-col gap-4 theme-mockup-sync relative z-10">
+                  <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                    {/* Logo Color Sync */}
+                    <div className="flex items-center gap-2">
+                       <div className="w-4 h-4 rounded-md bg-current shadow-sm"></div>
+                       <div className="w-12 h-2 bg-text opacity-10 rounded-full"></div>
+                    </div>
+                    <div className="flex gap-2">
+                       <div className="w-10 h-4 bg-current opacity-20 rounded-md"></div>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3">Export to Figma & PDF</h3>
-                  <p className="text-gray-500 leading-relaxed text-sm max-w-sm">
-                    Take your portfolio anywhere. Export high-quality PDFs for emails or Figma files for further professional design work.
-                  </p>
-               </div>
-               <div className="flex gap-3 items-end opacity-50 group-hover:opacity-100 transition-opacity">
-                  <div className="px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-400">PDF</div>
-                  <div className="px-4 py-2 bg-gray-100 rounded-lg text-sm font-bold text-gray-400">FIG</div>
-               </div>
+                  {/* Theme Content */}
+                  <div className="space-y-3 mt-2">
+                    {/* Changed color inheritance: removed text-text so it uses the animated color from parent */}
+                    <div className="text-[14px] font-black leading-tight text-current">
+                       Build a <span className="underline decoration-current/30 underline-offset-4">career</span> that inspires everyone.
+                    </div>
+                    <div className="space-y-1.5 opacity-40">
+                      <div className="w-full h-1.5 bg-current opacity-20 rounded-full"></div>
+                      <div className="w-3/4 h-1.5 bg-current opacity-20 rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="mt-auto pt-4 border-t border-border/50 flex items-center justify-between">
+                    <div className="px-3 py-1.5 bg-current opacity-10 rounded-md text-[8px] font-bold">SEND MESSAGE</div>
+                    <div className="flex gap-1.5">
+                       {[1, 2].map(i => <div key={i} className="w-3 h-3 rounded-full bg-current opacity-20"></div>)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Expert Exports (5/12) */}
+            <div className="md:col-span-12 lg:col-span-5 bg-background p-10 rounded-[2.5rem] shadow-sm border border-border group overflow-hidden flex flex-col relative min-h-[400px]">
+              <div className="relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center mb-6 border border-orange-100 transition-transform group-hover:-rotate-6">
+                  <Share className="w-6 h-6" />
+                </div>
+                <h3 className="text-2xl font-extrabold mb-4">Expert Exports</h3>
+                <p className="text-text-secondary leading-relaxed mb-6">
+                  One-click export to high-fidelity PDF, Figma, or professional resumes.
+                </p>
+              </div>
+
+              {/* Simulation: Transformation Chamber */}
+              <div className="mt-auto relative h-52 w-full bg-background-tertiary/20 rounded-[2.5rem] border border-border flex flex-col items-center justify-center overflow-hidden">
+                 {/* Transformation Zone */}
+                 <div className="relative w-48 h-32 flex items-center justify-center">
+                    {/* The "File" moving through */}
+                    <div className="absolute w-24 h-32 bg-white rounded-lg shadow-2xl border border-orange-100/50 flex flex-col p-4 gap-2 animate-file-slide">
+                       <div className="w-full h-2 bg-orange-100 rounded"></div>
+                       <div className="w-3/4 h-2 bg-orange-50 rounded"></div>
+                       <div className="mt-auto flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-sm bg-orange-500"></div>
+                          <div className="w-8 h-1.5 bg-orange-100 rounded"></div>
+                       </div>
+                    </div>
+
+                    {/* Scanning Beam */}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-500/20 to-transparent w-full h-[200%] animate-scan-beam pointer-events-none">
+                       <div className="w-full h-[2px] bg-orange-500 shadow-[0_0_15px_#f97316]"></div>
+                    </div>
+                 </div>
+
+                 {/* Export Formats (Bottom) */}
+                 <div className="absolute bottom-4 flex gap-4">
+                    <div className="px-3 py-1 bg-white rounded-lg shadow-sm border border-border text-[10px] font-bold text-rose-500">.PDF</div>
+                    <div className="px-3 py-1 bg-white rounded-lg shadow-sm border border-border text-[10px] font-bold text-indigo-500">.FIG</div>
+                    <div className="px-3 py-1 bg-white rounded-lg shadow-sm border border-border text-[10px] font-bold text-emerald-500">.DOCX</div>
+                 </div>
+              </div>
+            </div>
+
+            {/* 5. Global Research (Full Width) */}
+            <div className="md:col-span-12 bg-background p-10 rounded-[2.5rem] shadow-sm border border-border group overflow-hidden relative min-h-[500px] flex flex-col lg:flex-row gap-12 items-center">
+              <div className="max-w-xl relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 border border-emerald-100 transition-transform group-hover:scale-110">
+                  <Search className="w-6 h-6" />
+                </div>
+                <h3 className="text-3xl font-extrabold mb-4">Global Intelligence</h3>
+                <p className="text-text-secondary leading-relaxed text-lg mb-8">
+                  Our agents actively research global job markets and position your portfolio where the highest-intent recruiters are looking.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {['SEO Optimized', 'Global Reach', 'Contextual Matching'].map(tag => (
+                    <span key={tag} className="px-4 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100 uppercase tracking-tight">{tag}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Simulation: Intelligence Radar */}
+              <div className="flex-1 w-full bg-background-tertiary/20 rounded-[3rem] border border-border p-8 relative flex items-center justify-center overflow-hidden min-h-[350px]">
+                 {/* Radar Pulse circles */}
+                 <div className="absolute w-24 h-24 rounded-full border border-emerald-500/30 animate-radar"></div>
+                 <div className="absolute w-24 h-24 rounded-full border border-emerald-500/30 animate-radar [animation-delay:1.5s]"></div>
+                 <div className="absolute w-24 h-24 rounded-full border border-emerald-500/30 animate-radar [animation-delay:3s]"></div>
+
+                 {/* The "Discovery" Spotlight */}
+                 <div className="relative z-10 w-full max-w-md bg-white rounded-3xl shadow-2xl border border-emerald-100 p-6 animate-spotlight">
+                    <div className="flex items-center justify-between mb-6">
+                       <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white">
+                             <TrendingUp className="w-5 h-5" />
+                          </div>
+                          <div>
+                             <h4 className="text-sm font-black uppercase tracking-widest text-emerald-600">Top Match Found</h4>
+                             <p className="text-[10px] text-text-secondary">San Francisco • Remote • $180k+</p>
+                          </div>
+                       </div>
+                       <div className="text-2xl font-black text-emerald-500">98%</div>
+                    </div>
+                    
+                    <div className="relative group/mock">
+                       <div className="h-4 w-full bg-emerald-50 rounded-full mb-3 overflow-hidden">
+                          <div className="h-full bg-emerald-500 w-3/4 animate-pulse"></div>
+                       </div>
+                       <div className="space-y-2">
+                          <div className="h-2 w-full bg-background-tertiary rounded-full"></div>
+                          <div className="h-2 w-2/3 bg-background-tertiary rounded-full"></div>
+                       </div>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
+                       <span className="text-[10px] font-bold text-text-secondary uppercase">Scanning Global Databases...</span>
+                       <div className="flex -space-x-2">
+                          {[1,2,3].map(i => <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-emerald-100 flex items-center justify-center text-[8px] font-bold">🎯</div>)}
+                       </div>
+                    </div>
+                 </div>
+              </div>
             </div>
           </div>
         </section>
@@ -181,60 +440,66 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <h2
               style={{ fontFamily: "var(--font-display)" }}
-              className="text-3xl md:text-4xl font-bold tracking-tight text-[#191c1e] mb-4"
+              className="text-3xl md:text-4xl font-bold tracking-tight text-text mb-4"
             >
               How it Works
             </h2>
-            <p className="text-gray-500 text-lg">
+            <p className="text-text-secondary text-lg">
               Go from zero to a professional portfolio in three simple steps.
             </p>
           </div>
 
-          <div className="bg-white rounded-[2rem] p-4 sm:p-8 md:p-12 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-12">
-            {/* Steps List */}
-            <div className="flex-1 flex flex-col gap-4">
+          <div className="bg-background rounded-[2rem] p-4 sm:p-8 md:p-12 shadow-sm border border-border flex flex-col lg:flex-row items-center gap-12 overflow-hidden">
+            {/* Steps List (Left) */}
+            <div className="w-full lg:w-[400px] flex flex-col gap-4">
               {[
                 {
                   id: 1,
-                  title: "Upload",
-                  desc: "Securely upload your resume or paste a link. Our AI parses every detail to build your base profile.",
+                  title: "Upload Resume",
+                  desc: "Our AI parses your experience to create a baseline profile instantly.",
                 },
                 {
                   id: 2,
-                  title: "Customize",
-                  desc: "Fine-tune the design. Select layouts, add project artifacts, and customize your personal brand colors.",
+                  title: "Customize Design",
+                  desc: "Pick layouts and colors that match your professional brand.",
                 },
                 {
                   id: 3,
-                  title: "Share",
-                  desc: "Launch your unique URL, export to a high-quality PDF, or grab a Figma file for total control.",
+                  title: "Share URL",
+                  desc: "Launch your portfolio and share your unique link with the world.",
                 },
               ].map((step) => {
                 const isActive = activeStep === step.id;
                 return (
                   <div
                     key={step.id}
-                    onClick={() => setActiveStep(step.id)}
-                    className={`p-6 rounded-2xl cursor-pointer transition-all border ${
-                      isActive
-                        ? "bg-[#f8f9fe] border-[#c7d2fe] shadow-sm"
-                        : "bg-transparent border-transparent hover:bg-gray-50"
-                    } flex gap-5`}
+                    onClick={() => handleStepClick(step.id)}
+                    className={`p-6 rounded-2xl cursor-pointer transition-all border relative overflow-hidden ${isActive
+                      ? "bg-primary-light/30 border-primary/20 shadow-sm"
+                      : "bg-transparent border-transparent hover:bg-background-secondary"
+                      } flex gap-5`}
                   >
+                    {/* Progress Bar (Only active) */}
+                    {isActive && (
+                      <div
+                        className="absolute bottom-0 left-0 h-1 bg-primary/20 transition-all duration-100 ease-linear"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    )}
+
                     <div
-                      className={`w-8 h-8 rounded-full flex shrink-0 items-center justify-center font-bold text-sm ${
-                        isActive
-                          ? "bg-[#4f46e5] text-white"
-                          : "bg-gray-200 text-gray-500"
-                      }`}
+                      className={`w-8 h-8 rounded-full flex shrink-0 items-center justify-center font-bold text-sm transition-colors ${isActive
+                        ? "bg-primary text-white"
+                        : "bg-background-tertiary text-text-secondary"
+                        }`}
                     >
                       {step.id}
                     </div>
                     <div>
-                      <h4 className={`text-lg font-bold mb-1 ${isActive ? "text-[#191c1e]" : "text-gray-500"}`}>
+                      <h4 className={`text-lg font-bold mb-1 transition-colors ${isActive ? "text-text" : "text-text-secondary"}`}>
                         {step.title}
                       </h4>
-                      <p className={`text-sm leading-relaxed ${isActive ? "text-gray-600" : "text-gray-400"}`}>
+                      <p className={`text-sm leading-relaxed transition-colors ${isActive ? "text-text-secondary" : "text-text-muted"}`}>
                         {step.desc}
                       </p>
                     </div>
@@ -243,51 +508,88 @@ export default function HomePage() {
               })}
             </div>
 
-            {/* Interactive Visual Window */}
-            <div className="flex-1 w-full bg-[#1e2336] rounded-2xl p-4 shadow-xl border border-gray-800 flex flex-col aspect-[4/3] md:aspect-auto md:h-[400px]">
-              {/* Window Header */}
-              <div className="flex gap-2 mb-8">
-                <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            {/* Visual Canvas (Right) - Video Simulation */}
+            <div className="flex-1 w-full bg-text rounded-[2rem] p-4 shadow-2xl border border-border-strong/10 flex flex-col h-[400px] md:h-[500px] relative overflow-hidden group">
+              {/* Fake Player UI */}
+              <div className="absolute top-6 left-6 flex gap-2 z-20">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
               </div>
-              {/* Window Body - Changes based on step */}
-              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-gray-700 rounded-xl bg-[#2a3047] relative">
+
+              <div className="absolute top-6 right-6 px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[10px] font-bold text-white/50 z-20 uppercase tracking-widest">
+                Real-time Preview
+              </div>
+
+              {/* Main Visual Content */}
+              <div className="flex-1 rounded-xl bg-background-tertiary/5 relative mt-8 overflow-hidden flex items-center justify-center p-8">
                 {activeStep === 1 && (
-                  <div className="animate-fade-up">
-                    <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <span className="material-symbols-rounded text-blue-400 text-3xl">cloud_upload</span>
+                  <div className="animate-fade-up flex flex-col items-center">
+                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 relative">
+                      <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-ping"></div>
+                      <UploadCloud className="text-primary w-10 h-10" />
                     </div>
-                    <div className="w-48 h-2 bg-[#4f46e5] rounded-full mx-auto mb-4 shadow-[0_0_15px_rgba(79,70,229,0.5)]"></div>
-                    <p className="text-xs text-gray-400 font-medium tracking-widest uppercase">PROCESSING RESUME.PDF...</p>
+                    <div className="w-56 h-3 bg-background-tertiary/20 rounded-full overflow-hidden mb-4">
+                      <div
+                        className="h-full bg-primary transition-all duration-100"
+                        style={{ width: `${progress}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-[10px] text-text-muted font-bold tracking-[0.2em] uppercase">Analyzing Resume Structure...</p>
                   </div>
                 )}
+
                 {activeStep === 2 && (
-                  <div className="animate-fade-up w-full text-left">
-                     <div className="flex gap-4 mb-6">
-                        <div className="w-1/3 h-24 bg-indigo-500/20 rounded-lg border border-indigo-500/50"></div>
-                        <div className="w-1/3 h-24 bg-white/5 rounded-lg border border-white/10"></div>
-                        <div className="w-1/3 h-24 bg-white/5 rounded-lg border border-white/10"></div>
-                     </div>
-                     <div className="flex gap-2">
-                        <div className="w-6 h-6 rounded-full bg-indigo-500 cursor-pointer border-2 border-white"></div>
-                        <div className="w-6 h-6 rounded-full bg-emerald-500 cursor-pointer"></div>
-                        <div className="w-6 h-6 rounded-full bg-rose-500 cursor-pointer"></div>
-                     </div>
+                  <div className="animate-fade-up w-full max-w-md h-full flex flex-col">
+                    <div className="flex gap-4 mb-4">
+                      <div className="flex-1 aspect-video bg-background/5 rounded-lg border border-border-strong/20 p-3 space-y-2">
+                        <div className="w-1/2 h-2 bg-border-strong/20 rounded"></div>
+                        <div className="w-full h-1 bg-border-strong/10 rounded"></div>
+                        <div className="w-full h-1 bg-border-strong/10 rounded"></div>
+                      </div>
+                      <div className="w-24 h-full flex flex-col gap-2">
+                        <div className="h-6 w-full bg-primary rounded shadow-lg shadow-primary/20"></div>
+                        <div className="h-6 w-full bg-border-strong/10 rounded"></div>
+                        <div className="h-6 w-full bg-border-strong/10 rounded"></div>
+                      </div>
+                    </div>
+                    <div className="flex-1 bg-background/5 rounded-lg border border-border-strong/20 p-6 flex flex-col gap-3">
+                      <div className="w-1/4 h-4 bg-primary/20 rounded"></div>
+                      <div className="w-full h-24 border-2 border-dashed border-border-strong/20 rounded-xl flex items-center justify-center">
+                        <Palette className="w-8 h-8 text-text-muted opacity-20" />
+                      </div>
+                    </div>
                   </div>
                 )}
+
                 {activeStep === 3 && (
-                  <div className="animate-fade-up text-center w-full">
-                     <div className="inline-flex items-center gap-2 bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded-full text-sm font-bold mb-6 border border-emerald-500/30">
-                        <span className="material-symbols-rounded text-sm">check_circle</span>
-                        Published successfully
-                     </div>
-                     <div className="bg-black/40 p-4 rounded-xl border border-white/10 flex items-center justify-between">
-                        <span className="text-gray-300 text-sm truncate mr-4">shortlistme.com/p/alex-rivera</span>
-                        <button className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded text-white text-xs font-semibold">Copy</button>
-                     </div>
+                  <div className="animate-fade-up text-center w-full max-w-sm">
+                    <div className="inline-flex items-center gap-3 bg-emerald-500/10 text-emerald-500 px-5 py-2.5 rounded-full text-sm font-bold mb-8 border border-emerald-500/20 shadow-lg shadow-emerald-500/5">
+                      <CheckCircle className="w-5 h-5" />
+                      Portfolio Live at yourlink.me
+                    </div>
+                    <div className="bg-white/5 p-6 rounded-[2rem] border border-white/10 flex flex-col gap-6">
+                      <div className="flex items-center justify-between gap-4 bg-black/40 px-4 py-3 rounded-xl border border-white/5">
+                        <span className="text-white/40 text-xs truncate">shortlistme.com/p/alex-r</span>
+                        <button className="bg-primary text-white px-3 py-1 rounded-lg text-[10px] font-bold">Copy</button>
+                      </div>
+                      <div className="flex gap-3">
+                        <div className="flex-1 h-10 bg-white/5 rounded-xl border border-white/5"></div>
+                        <div className="flex-1 h-10 bg-white/5 rounded-xl border border-white/5"></div>
+                      </div>
+                    </div>
                   </div>
                 )}
+              </div>
+
+              {/* Fake Video Timeline */}
+              <div className="h-1 w-full bg-white/5 mt-auto relative">
+                <div
+                  className="h-full bg-primary absolute left-0 top-0 transition-all duration-100 ease-linear"
+                  style={{
+                    width: `${((activeStep - 1) * 33.33) + (progress / 3)}%`
+                  }}
+                ></div>
               </div>
             </div>
           </div>
@@ -298,11 +600,11 @@ export default function HomePage() {
           <div className="text-center mb-16">
             <h2
               style={{ fontFamily: "var(--font-display)" }}
-              className="text-3xl md:text-4xl font-bold tracking-tight text-[#191c1e] mb-4"
+              className="text-3xl md:text-4xl font-bold tracking-tight text-text mb-4"
             >
               Frequently Asked Questions
             </h2>
-            <p className="text-gray-500 text-lg">
+            <p className="text-text-secondary text-lg">
               Got questions? We've got answers.
             </p>
           </div>
@@ -312,7 +614,6 @@ export default function HomePage() {
               {
                 q: "How does the AI generate my portfolio?",
                 a: "Our proprietary AI engine analyzes your resume's structure, keywords, and work history. It then maps this data to a curated collection of high-fidelity design templates, automatically selecting layouts that best highlight your specific career strengths.",
-                open: true,
               },
               {
                 q: "Is my resume data kept private?",
@@ -330,33 +631,47 @@ export default function HomePage() {
                 q: "Do I need design skills to use ShortlistMe?",
                 a: "Not at all. The platform is built specifically for non-designers to have top-tier, designer-quality portfolios instantly.",
               },
-            ].map((faq, i) => (
-              <details
-                key={i}
-                className="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 cursor-pointer [&_summary::-webkit-details-marker]:hidden"
-                open={faq.open}
-              >
-                <summary className="flex items-center justify-between font-bold text-gray-900 outline-none">
-                  {faq.q}
-                  <span className="material-symbols-rounded text-gray-400 group-open:rotate-180 transition-transform">
-                    expand_more
-                  </span>
-                </summary>
-                <div className="mt-4 text-gray-500 leading-relaxed text-sm">
-                  {faq.a}
+            ].map((faq, i) => {
+              const isOpen = openFaqIndex === i;
+              return (
+                <div
+                  key={i}
+                  className={`bg-background rounded-2xl shadow-sm border ${isOpen ? "border-primary" : "border-border"
+                    } transition-all duration-300 overflow-hidden`}
+                >
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : i)}
+                    className="w-full text-left p-6 flex items-center justify-between font-bold text-text outline-none hover:bg-background-secondary/50 transition-colors"
+                  >
+                    {faq.q}
+                    <ChevronDown
+                      className={`text-text-muted w-6 h-6 transition-transform duration-300 ${isOpen ? "rotate-180 text-primary" : ""
+                        }`}
+                    />
+                  </button>
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                      }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="px-6 pb-6 text-text-secondary leading-relaxed text-sm">
+                        {faq.a}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </details>
-            ))}
+              );
+            })}
           </div>
         </section>
 
         {/* ── CTA Banner ── */}
         <section className="py-24">
-          <div className="bg-gradient-to-br from-[#4f46e5] to-[#3730a3] rounded-3xl p-12 md:p-20 text-center relative overflow-hidden shadow-2xl shadow-indigo-500/30">
+          <div className="bg-gradient-to-br from-primary to-primary-dark rounded-[2.5rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl shadow-primary/20 border border-white/5">
             {/* Background decorations */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
-            
+            <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-black/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
+
             <div className="relative z-10 max-w-2xl mx-auto">
               <h2
                 style={{ fontFamily: "var(--font-display)" }}
@@ -364,12 +679,12 @@ export default function HomePage() {
               >
                 Ready to transform your career?
               </h2>
-              <p className="text-indigo-100 text-lg mb-10 max-w-lg mx-auto leading-relaxed">
+              <p className="text-white/80 text-lg mb-10 max-w-lg mx-auto leading-relaxed">
                 Join 5,000+ designers, developers, and creators who have leveled up their professional presence.
               </p>
               <Link
                 href="/sign-up"
-                className="inline-block bg-white text-[#4f46e5] hover:bg-indigo-50 px-8 py-4 rounded-xl text-lg font-bold transition-transform hover:scale-105 active:scale-95 shadow-xl"
+                className="inline-block bg-background text-primary hover:bg-background-secondary px-10 py-4 rounded-2xl text-lg font-bold transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-black/10"
               >
                 Start Building for Free
               </Link>
@@ -379,25 +694,77 @@ export default function HomePage() {
       </main>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-gray-200/60 bg-white">
+      <footer className="border-t border-border-strong/60 bg-background">
         <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col gap-2">
             <span
               style={{ fontFamily: "var(--font-display)" }}
-              className="font-extrabold text-xl tracking-tight text-[#191c1e]"
+              className="font-extrabold text-xl tracking-tight text-text"
             >
               ShortlistMe
             </span>
-            <span className="text-sm text-gray-400">© 2026 ShortlistMe. All rights reserved.</span>
+            <span className="text-sm text-text-muted">© 2026 ShortlistMe. All rights reserved.</span>
           </div>
-          <div className="flex gap-6 text-sm font-medium text-gray-400">
-            <Link href="#" className="hover:text-gray-600 transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-gray-600 transition-colors">Terms of Service</Link>
-            <Link href="#" className="hover:text-gray-600 transition-colors">Contact Us</Link>
-            <Link href="#" className="hover:text-gray-600 transition-colors">Twitter</Link>
+          <div className="flex gap-6 text-sm font-medium text-text-muted">
+            <button
+              onClick={() => setIsTeamCanvasOpen(true)}
+              className="hover:text-text transition-colors flex items-center gap-1 font-semibold"
+            >
+              Meet our Team <span className="text-primary group-hover:translate-x-0.5 transition-transform">→</span>
+            </button>
           </div>
         </div>
       </footer>
+
+      {/* ── Team Canvas Overlay ── */}
+      {isTeamCanvasOpen && (
+        <div className="fixed inset-0 z-[100] flex justify-end">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsTeamCanvasOpen(false)}
+          ></div>
+
+          {/* Sliding Canvas */}
+          <div className="relative w-full max-w-md h-full bg-background shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col border-l border-border">
+            <div className="p-6 border-b border-border flex items-center justify-between">
+              <h2 className="text-xl font-bold font-display text-text">Our Team</h2>
+              <button
+                onClick={() => setIsTeamCanvasOpen(false)}
+                className="w-8 h-8 rounded-full bg-background-secondary flex items-center justify-center text-text-muted hover:text-text transition-colors"
+                aria-label="Close canvas"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
+              {[
+                { name: "Sarah Jenkins", role: "Founder & CEO", avatar: "Sarah", bgColor: "bg-blue-100", textColor: "text-blue-700" },
+                { name: "David Chen", role: "Lead Engineer", avatar: "David", bgColor: "bg-green-100", textColor: "text-green-700" },
+                { name: "Elena Rodriguez", role: "Product Designer", avatar: "Elena", bgColor: "bg-purple-100", textColor: "text-purple-700" },
+                { name: "Marcus Johnson", role: "Head of Operations", avatar: "Marcus", bgColor: "bg-orange-100", textColor: "text-orange-700" }
+              ].map((member, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-border bg-background-secondary/50 hover:bg-background-secondary transition-colors">
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl ${member.bgColor} ${member.textColor} overflow-hidden`}>
+                    <img src={`https://api.dicebear.com/9.x/notionists/svg?seed=${member.avatar}&backgroundColor=transparent`} alt={member.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-text text-base">{member.name}</h3>
+                    <p className="text-sm font-medium text-text-secondary">{member.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-6 border-t border-border bg-background-secondary mt-auto">
+              <p className="text-sm text-text-muted text-center">
+                We're a small, passionate team dedicated to empowering creators.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
