@@ -98,7 +98,7 @@ export default function HomePage() {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-6">
         {/* ── Hero Section ── */}
-        <section className="py-20 md:py-28 flex flex-col lg:flex-row items-center gap-16">
+        <section className="pt-32 pb-20 md:pt-44 md:pb-28 flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1 text-center lg:text-left relative z-10 w-full max-w-2xl mx-auto lg:mx-0">
 
 
@@ -744,11 +744,11 @@ export default function HomePage() {
 
             <h2
               style={{ fontFamily: "var(--font-display)" }}
-              className="text-4xl md:text-5xl font-extrabold tracking-tight text-white mb-4"
+              className="text-4xl md:text-5xl font-extrabold tracking-tight text-text mb-4"
             >
               Have <span className="text-emerald-500 italic font-medium">questions?</span>
             </h2>
-            <p className="text-white/60 text-lg max-w-xl mx-auto">
+            <p className="text-text-secondary text-lg max-w-xl mx-auto">
               Everything you need to know about the product and how it works.
             </p>
           </div>
@@ -780,20 +780,20 @@ export default function HomePage() {
               return (
                 <div
                   key={i}
-                  className={`bg-[#080808] rounded-2xl transition-all duration-500 overflow-hidden relative group ${isOpen
+                  className={`bg-background rounded-2xl transition-all duration-500 overflow-hidden relative group ${isOpen
                     ? "ring-1 ring-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.08)] bg-gradient-to-b from-emerald-500/[0.03] to-transparent scale-[1.02] z-10"
-                    : "ring-1 ring-white/10 hover:ring-white/20 hover:bg-white/[0.02]"
+                    : "ring-1 ring-border hover:ring-border-strong hover:bg-background-tertiary"
                     }`}
                 >
                   {isOpen && <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-80 shadow-[0_0_15px_#10b981]"></div>}
                   <button
                     onClick={() => setOpenFaqIndex(isOpen ? null : i)}
-                    className="w-full text-left px-6 py-6 sm:px-8 flex items-center justify-between font-bold text-white outline-none"
+                    className="w-full text-left px-6 py-6 sm:px-8 flex items-center justify-between font-bold text-text outline-none"
                   >
-                    <span className={`${isOpen ? "text-emerald-400" : "text-white/90 group-hover:text-white"} transition-colors text-[15px] sm:text-[17px] pr-4 tracking-tight`}>
+                    <span className={`${isOpen ? "text-emerald-500" : "text-text-secondary group-hover:text-text"} transition-colors text-[15px] sm:text-[17px] pr-4 tracking-tight`}>
                       {faq.q}
                     </span>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${isOpen ? "bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)] text-[#080808]" : "bg-white/5 text-white/40 group-hover:bg-white/10 group-hover:text-white/80"}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${isOpen ? "bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)] text-background" : "bg-background-tertiary text-text-muted group-hover:bg-border group-hover:text-text-secondary"}`}>
                       <ChevronDown
                         className={`w-4 h-4 transition-transform duration-500 ${isOpen ? "rotate-180" : ""}`}
                         strokeWidth={isOpen ? 3 : 2}
@@ -805,7 +805,7 @@ export default function HomePage() {
                       }`}
                   >
                     <div className="overflow-hidden">
-                      <div className="px-6 sm:px-8 pb-6 sm:pb-8 text-white/60 leading-relaxed text-[15px] sm:text-base">
+                      <div className="px-6 sm:px-8 pb-6 sm:pb-8 text-text-secondary leading-relaxed text-[15px] sm:text-base">
                         {faq.a}
                       </div>
                     </div>
@@ -903,89 +903,83 @@ export default function HomePage() {
 
       {/* ── Team Modal Overlay ── */}
       {isTeamCanvasOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center sm:p-4">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/90 backdrop-blur-xl transition-opacity duration-700 animate-in fade-in"
             onClick={() => setIsTeamCanvasOpen(false)}
           ></div>
 
-          {/* Cinematic Gallery Modal */}
-          <div className="relative w-full max-w-6xl bg-[#080808]/60 backdrop-blur-3xl shadow-[0_50px_150px_rgba(0,0,0,1)] animate-in zoom-in-95 fade-in duration-500 flex flex-col border border-white/10 rounded-[5rem] overflow-hidden">
-            <div className="p-14 pb-8 flex items-center justify-between">
+          <div className="relative w-full max-w-6xl h-[85vh] sm:h-auto bg-[#080808]/90 backdrop-blur-3xl shadow-[0_-20px_100px_rgba(0,0,0,0.8)] sm:shadow-[0_50px_150px_rgba(0,0,0,1)] animate-in slide-in-from-bottom sm:zoom-in-95 fade-in duration-500 flex flex-col border border-white/10 rounded-t-[2.5rem] sm:rounded-3xl md:rounded-[5rem] rounded-b-none sm:rounded-b-3xl md:rounded-b-[5rem] overflow-hidden">
+            {/* Mobile Drag Handle */}
+            <div className="w-12 h-1.5 bg-white/20 rounded-full mx-auto mt-4 mb-2 md:hidden"></div>
+
+            <div className="px-6 py-4 md:p-14 md:pb-8 flex items-center justify-between">
               <div>
-                <h2 className="text-4xl md:text-5xl font-black font-display text-white tracking-tighter">
+                <h2 className="text-xl md:text-5xl font-black font-display text-white tracking-tighter">
                   Our <span className="text-emerald-500 italic">Makers</span>
                 </h2>
-                <p className="text-white/30 text-[11px] font-bold uppercase tracking-[0.4em] mt-3">Merging creativity with silicon</p>
+                <p className="text-white/30 text-[9px] md:text-[11px] font-bold uppercase tracking-[0.4em] mt-1 md:mt-3">Merging creativity with silicon</p>
               </div>
               <button
                 onClick={() => setIsTeamCanvasOpen(false)}
-                className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-red-500 transition-all active:scale-90"
+                className="w-8 h-8 md:w-14 md:h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-emerald-500 transition-all active:scale-90"
                 aria-label="Close"
               >
-                ✕
+                <span className="text-xs md:text-base">✕</span>
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-12 pt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="flex-1 overflow-y-auto px-6 md:px-12 py-4 md:py-8 pt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8">
               {[
                 { name: "Tushar Bhardwaj", avatar: "Tushar", link: "https://minianonlink.vercel.app/tusharbhardwaj" },
                 { name: "Sweta Shukla", avatar: "Sweta", link: "https://minianonlink.vercel.app/swetashukla4" },
                 { name: "Ruvaid Ahmad", avatar: "Ruvaid", link: "https://minianonlink.vercel.app/ruvaidahmad" },
                 { name: "Kwinsi Thakkar", avatar: "Kwinsi", link: "https://minianonlink.vercel.app/kwinsithakkar" }
               ].map((member, i) => (
-                <a 
-                  key={i} 
+                <a
+                  key={i}
                   href={member.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative flex flex-col rounded-[3rem] overflow-hidden border border-white/5 bg-white/[0.02] transition-all hover:border-emerald-500/30 hover:shadow-[0_20px_50px_rgba(16,185,129,0.1)] active:scale-[0.98]"
+                  className="group relative flex flex-row md:flex-col items-center md:items-stretch rounded-2xl md:rounded-[3rem] overflow-hidden border border-white/5 bg-white/[0.02] p-2 md:p-3 transition-all hover:border-emerald-500/30 hover:shadow-[0_20px_50px_rgba(16,185,129,0.1)] active:scale-[0.98]"
                 >
-                  {/* Portrait Area */}
-                  <div className="aspect-[3/4] w-full relative overflow-hidden">
-                    <img 
-                      src={`/team/${member.name.toLowerCase().replace(/ /g, '-')}.jpeg`} 
-                      alt={member.name} 
+                  {/* Portrait Area / Avatar */}
+                  <div className="w-16 h-16 md:w-full md:aspect-[3/4] md:min-h-[280px] relative overflow-hidden rounded-xl md:rounded-2xl flex-shrink-0 bg-white/[0.03] md:p-2">
+                    <img
+                      src={`/team/${member.name.toLowerCase().replace(/ /g, '-')}.jpeg`}
+                      alt={member.name}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = `https://api.dicebear.com/9.x/notionists/svg?seed=${member.avatar}&backgroundColor=transparent`;
                       }}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                      className="w-full h-full object-cover md:object-contain object-top transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity"></div>
-                    
-                    {/* Floating Status Badge */}
-                    <div className="absolute bottom-6 left-6 right-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30">
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span className="text-emerald-400 text-[10px] font-black uppercase tracking-widest">Active</span>
-                      </div>
+
+                    {/* Status Badge - Dot Only */}
+                    <div className="absolute top-1 left-1 md:top-4 md:left-4 flex items-center justify-center p-1 md:p-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                      <div className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                     </div>
                   </div>
 
                   {/* Name Info Section */}
-                  <div className="p-8 text-center bg-gradient-to-b from-transparent to-black/40">
-                    <h3 className="font-bold text-white text-xl tracking-tight group-hover:text-emerald-400 transition-colors">
-                      {member.name.split(' ')[0]} <br/> <span className="text-white/50 group-hover:text-emerald-500/50 transition-colors">{member.name.split(' ')[1]}</span>
+                  <div className="flex-1 md:flex-none p-3 md:p-5 text-left md:text-center md:bg-gradient-to-b md:from-transparent md:to-black/40">
+                    <h3 className="font-bold text-white text-sm md:text-xl tracking-tight group-hover:text-emerald-400 transition-colors">
+                      {member.name.split(' ')[0]} <span className="md:hidden"> </span> <span className="text-white/50 group-hover:text-emerald-500/50 transition-colors md:block text-xs md:text-lg">{member.name.split(' ')[1]}</span>
                     </h3>
                   </div>
-                  
-                  {/* External Link Icon Hover Layer */}
-                  <div className="absolute top-6 right-6 w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white/40 opacity-0 group-hover:opacity-100 transition-opacity scale-90 group-hover:scale-100 duration-300">
+
+                  {/* External Link Icon Hover Layer (Desktop only for visibility) */}
+                  <div className="absolute top-6 right-6 w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 hidden md:flex items-center justify-center text-white/40 opacity-0 group-hover:opacity-100 transition-opacity scale-90 group-hover:scale-100 duration-300">
                     <Link2 className="w-4 h-4" />
                   </div>
                 </a>
               ))}
             </div>
 
-            <div className="p-14 pt-0 mt-auto">
-              <div className="bg-emerald-500/[0.03] border border-emerald-500/10 p-10 rounded-[4rem] flex items-center justify-center gap-8">
-                <div className="hidden md:flex -space-x-4">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="w-10 h-10 rounded-full border-2 border-[#080808] bg-emerald-500/20"></div>
-                  ))}
-                </div>
-                <p className="text-sm text-emerald-400/50 font-medium leading-relaxed max-w-md text-center">
+            <div className="p-4 md:p-14 pt-0 mt-auto">
+              <div className="bg-emerald-500/[0.03] border border-emerald-500/10 p-4 md:p-10 rounded-2xl md:rounded-[4rem] flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                <p className="text-[10px] md:text-sm text-emerald-400/50 font-medium leading-relaxed max-w-md text-center">
                   We're a collective of designers and engineers building the future of generative careers.
                 </p>
               </div>
