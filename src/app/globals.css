@@ -555,6 +555,74 @@ div.theme-mockup-sync {
   animation: spotlightGlow 4s infinite ease-in-out;
 }
 
+/* ── SaaS Pipeline 5-Scene Animation ── */
+
+@keyframes saasResumeFade {
+  0%, 15% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  25%, 90% { opacity: 0; transform: translateY(-10px); filter: blur(2px); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes saasCardsBreak {
+  0%, 15% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  20%, 25% { opacity: 1; transform: translate(var(--bx), var(--by)) scale(1.1); box-shadow: 0 0 20px rgba(99, 102, 241, 0.4); }
+  35%, 60% { opacity: 1; transform: translate(var(--px), var(--py)) scale(1); box-shadow: 0 8px 16px rgba(0,0,0,0.05); }
+  65%, 100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0.9); }
+}
+
+@keyframes saasPortfolioBox {
+  0%, 30% { opacity: 0; transform: scale(0.9); }
+  35%, 60% { opacity: 1; transform: scale(1); }
+  65%, 100% { opacity: 0; transform: scale(0.9); }
+}
+
+@keyframes saasRadiate {
+  0%, 40% { opacity: 0; transform: scale(0.8); border-width: 0px; }
+  45% { opacity: 1; transform: scale(1); border-width: 2px; }
+  60% { opacity: 0; transform: scale(1.6); border-width: 0px; }
+  100% { opacity: 0; }
+}
+
+@keyframes saasDashboard {
+  0%, 55% { opacity: 0; transform: translateY(20px) scale(0.98); }
+  65%, 85% { opacity: 1; transform: translateY(0) scale(1); }
+  90%, 100% { opacity: 0; transform: translateY(-10px) scale(1); }
+}
+
+/* ── Instant Generation 5-Scene Pipeline ── */
+
+@keyframes igResume {
+  0%, 30% { opacity: 1; transform: scale(1); filter: blur(0); }
+  45%, 90% { opacity: 0; transform: scale(0.9); filter: blur(2px); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+@keyframes igScanner {
+  0%, 20% { transform: translateY(-20px); opacity: 0; }
+  25% { opacity: 1; transform: translateY(0); }
+  45% { opacity: 1; transform: translateY(180px); }
+  50%, 100% { opacity: 0; transform: translateY(190px); }
+}
+
+@keyframes igButton {
+  0%, 10% { transform: scale(0.8) translateY(20px); opacity: 0; }
+  15%, 25% { transform: scale(1) translateY(0); opacity: 1; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+  30% { transform: scale(0.9) translateY(0); opacity: 1; box-shadow: 0 0 0 rgba(16, 185, 129, 0); } /* Clicked */
+  35%, 100% { transform: scale(1.05) translateY(0); opacity: 0; }
+}
+
+@keyframes igPortfolio {
+  0%, 40% { opacity: 0; transform: scale(0.9) translateY(10px); }
+  50%, 85% { opacity: 1; transform: scale(1) translateY(0); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+  90%, 100% { opacity: 0; transform: scale(0.95); }
+}
+
+@keyframes igGlow {
+  0%, 55% { opacity: 0; box-shadow: 0 0 0 0px rgba(16, 185, 129, 0); }
+  65%, 80% { opacity: 1; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4), 0 0 20px rgba(16, 185, 129, 0.2); }
+  85%, 100% { opacity: 0; }
+}
+
 .analytics-graph-sync {
   animation: analyticsGrowth 5s infinite linear !important;
   transform-origin: left;
