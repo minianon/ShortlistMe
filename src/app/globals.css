@@ -465,11 +465,11 @@ body {
 }
 
 @keyframes themeShift {
-  0%, 10% { color: #178163 !important; }
-  25% { color: #6366f1 !important; }
-  50% { color: #f43f5e !important; }
-  75% { color: #6366f1 !important; }
-  90%, 100% { color: #178163 !important; }
+  0%, 10% { color: #178163; }
+  25% { color: #6366f1; }
+  50% { color: #f43f5e; }
+  75% { color: #6366f1; }
+  90%, 100% { color: #178163; }
 }
 
 .theme-dot-sync {
@@ -481,7 +481,8 @@ body {
 
 /* Force all internal mockup elements to honor the animated color */
 div.theme-mockup-sync {
-  animation: themeShift 4s infinite cubic-bezier(0.45, 0, 0.55, 1) !important;
+  animation: themeShift 4s infinite cubic-bezier(0.45, 0, 0.55, 1);
+  transform: translateZ(0); /* Hardware Acceleration */
 }
 
 .theme-mockup-sync *,
@@ -492,7 +493,7 @@ div.theme-mockup-sync {
 }
 
 .theme-mockup-sync .bg-current {
-  background-color: inherit !important;
+  background-color: currentcolor !important;
 }
 
 @keyframes analyticsGrowth {
