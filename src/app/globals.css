@@ -653,6 +653,12 @@ div.theme-mockup-sync {
   45%, 100% { width: 100%; opacity: 0; }
 }
 
+@keyframes heroResumePulse {
+  0%, 5% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; filter: blur(4px); }
+  15%, 35% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: blur(0); }
+  45%, 100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0; filter: blur(8px); }
+}
+
 @keyframes heroAiPulse {
   0%, 5% { transform: scale(0.5); opacity: 0; border-width: 2px; }
   15%, 25% { transform: scale(2); opacity: 0.3; border-width: 1px; }
