@@ -174,64 +174,63 @@ export default function HomePage() {
                   <div className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Fast-Sync</div>
                 </div>
               </div>
-              <div className="flex-1 w-full lg:w-auto h-72 relative bg-background-secondary rounded-3xl border border-border-strong/10 p-0 overflow-hidden shadow-inner">
-                {/* Animation Container */}
-                <div className="absolute inset-0 flex flex-col animate-instant-gen h-[300%]">
-                  {/* Step 1: Uploading */}
-                  <div className="h-1/3 w-full flex flex-col items-center justify-center bg-background-secondary gap-4">
-                    <div className="w-16 h-20 bg-background rounded-lg border-2 border-dashed border-primary/40 flex items-center justify-center relative overflow-hidden group-hover:border-primary transition-colors">
-                      <UploadCloud className="w-8 h-8 text-primary animate-bounce" />
-                      <div className="absolute inset-x-0 bottom-0 h-1 bg-primary animate-[uploadProgress_4s_linear_infinite]"></div>
-                    </div>
-                    <div className="text-xs font-black text-primary tracking-widest uppercase">Initializing Parse...</div>
-                  </div>
+              <div className="flex-1 w-full lg:w-auto h-72 relative bg-background-secondary rounded-[2rem] border border-border-strong/10 p-0 overflow-hidden shadow-inner flex items-center justify-center">
+                 {/* Radial Glow Background */}
+                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent opacity-50"></div>
+                 
+                 {/* Scene 1 & 3: The Resume & Scanner */}
+                 <div className="absolute w-32 h-44 bg-white rounded-xl shadow-md border border-slate-200 p-3 flex flex-col gap-2 z-10 animate-[igResume_3s_infinite_cubic-bezier(0.25,1,0.5,1)] overflow-hidden">
+                    {/* Skeleton lines */}
+                    <div className="w-1/2 h-2.5 bg-slate-200 rounded mb-2"></div>
+                    <div className="w-full h-1.5 bg-slate-100 rounded"></div>
+                    <div className="w-5/6 h-1.5 bg-slate-100 rounded"></div>
+                    <div className="w-4/5 h-1.5 bg-slate-100 rounded mb-2"></div>
+                    <div className="w-full h-10 bg-slate-50 rounded mt-auto border border-slate-100"></div>
+                    
+                    {/* Scene 3: Scanning Line Overlay */}
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.8)] animate-[igScanner_3s_infinite_linear]"></div>
+                 </div>
 
-                  {/* Step 2: High-Fidelity AI Analysis (SVG Network) */}
-                  <div className="h-1/3 w-full flex flex-col items-center justify-center bg-background p-6 gap-2 relative">
-                    <svg viewBox="0 0 100 60" className="w-48 h-32 overflow-visible">
-                      <g className="text-primary/20">
-                         {/* Connection Lines */}
-                         <path d="M20,30 L50,15 M20,30 L50,45 M50,15 L80,30 M50,45 L80,30" stroke="currentColor" strokeWidth="1" className="animate-flow" />
-                      </g>
-                      {/* Pulse Nodes */}
-                      <circle cx="20" cy="30" r="4" className="fill-primary animate-node" />
-                      <circle cx="50" cy="15" r="3" className="fill-primary/60 animate-node" style={{ animationDelay: '0.4s' }} />
-                      <circle cx="50" cy="45" r="3" className="fill-primary/60 animate-node" style={{ animationDelay: '0.8s' }} />
-                      <circle cx="80" cy="30" r="4" className="fill-primary animate-node" style={{ animationDelay: '1.2s' }} />
-                    </svg>
-                    <div className="text-[10px] font-mono font-bold text-text-muted text-center max-w-[140px] leading-tight mt-2">
-                       Extracting Key Expertise & Narratives...
-                    </div>
-                  </div>
+                 {/* Scene 2: Generate Button */}
+                 <div className="absolute top-[65%] w-28 h-9 bg-emerald-600 rounded-full shadow-lg border border-emerald-500 text-white flex items-center justify-center gap-1.5 z-20 animate-[igButton_3s_infinite_cubic-bezier(0.25,1,0.5,1)]">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span className="text-[10px] font-black tracking-widest uppercase">Generate</span>
+                 </div>
 
-                  {/* Step 3: Portfolio Preview Launch */}
-                  <div className="h-1/3 w-full bg-background p-4 relative">
-                    <div className="w-full h-full rounded-xl border border-primary/20 bg-background-secondary shadow-2xl flex flex-col overflow-hidden relative group/mock">
-                      {/* Browser Mockup */}
-                      <div className="h-6 bg-border/30 flex items-center px-3 justify-between border-b border-border/50">
-                        <div className="flex gap-1">
-                          <div className="w-1.5 h-1.5 rounded-full bg-rose-400"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-amber-400"></div>
-                        </div>
-                        <div className="w-32 h-2 bg-white/50 rounded-full"></div>
-                      </div>
-                      <div className="flex-1 p-3 flex flex-col gap-3">
-                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/20"></div>
-                            <div className="space-y-1">
-                               <div className="w-16 h-2 bg-text opacity-10 rounded"></div>
-                               <div className="w-10 h-1.5 bg-text opacity-5 rounded"></div>
-                            </div>
-                         </div>
-                         <div className="w-full h-12 bg-primary/10 rounded-lg flex flex-col gap-1.5 p-2 border border-primary/5">
-                            <div className="w-3/4 h-1.5 bg-primary/40 rounded"></div>
-                            <div className="w-full h-1 bg-primary/10 rounded"></div>
-                         </div>
-                      </div>
-                      <div className="absolute top-8 right-3 bg-emerald-500 text-white text-[8px] font-black px-2 py-1 rounded shadow-lg animate-pulse">SITE ONLINE</div>
+                 {/* Scene 4 & 5: Polished Portfolio UI */}
+                 <div className="absolute w-56 h-40 bg-white rounded-2xl shadow-2xl border border-slate-100 p-3 flex flex-col gap-3 z-30 animate-[igPortfolio_3s_infinite_cubic-bezier(0.25,1,0.5,1)]">
+                    {/* Glowing effect wrapper */}
+                    <div className="absolute inset-0 rounded-2xl animate-[igGlow_3s_infinite_cubic-bezier(0.25,1,0.5,1)] pointer-events-none border border-emerald-500/20"></div>
+                    
+                    {/* Portfolio Header */}
+                    <div className="w-full h-6 flex justify-between items-center border-b border-slate-100 pb-2">
+                       <div className="w-5 h-5 rounded-md bg-emerald-100"></div>
+                       <div className="flex gap-2">
+                          <div className="w-8 h-1.5 bg-slate-100 rounded"></div>
+                          <div className="w-8 h-1.5 bg-slate-100 rounded"></div>
+                       </div>
                     </div>
-                  </div>
-                </div>
+                    {/* Portfolio Body Grid */}
+                    <div className="flex-1 flex gap-3">
+                       {/* Sidebar */}
+                       <div className="w-12 h-full flex flex-col gap-2 pt-1 border-r border-slate-50 pr-2">
+                          <div className="w-full h-1.5 bg-slate-200 rounded"></div>
+                          <div className="w-full h-1.5 bg-slate-100 rounded"></div>
+                          <div className="w-full h-1.5 bg-slate-100 rounded"></div>
+                       </div>
+                       {/* Main Content */}
+                       <div className="flex-1 h-full flex flex-col gap-2">
+                          <div className="w-full h-12 bg-slate-50 border border-slate-100 rounded-lg p-2.5 flex flex-col gap-2 relative overflow-hidden">
+                             <div className="absolute top-0 right-0 w-8 h-8 bg-emerald-500/10 rounded-bl-full"></div>
+                             <div className="w-1/2 h-2 bg-emerald-200 rounded"></div>
+                             <div className="w-3/4 h-1.5 bg-slate-200 rounded"></div>
+                          </div>
+                          <div className="w-full flex-1 bg-slate-50 border border-slate-100 rounded-lg p-2">
+                             <div className="w-2/3 h-1.5 bg-slate-200 rounded"></div>
+                          </div>
+                       </div>
+                    </div>
+                 </div>
               </div>
             </div>
 
@@ -391,42 +390,90 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Simulation: Intelligence Radar */}
-              <div className="flex-1 w-full bg-background-tertiary/20 rounded-[3rem] border border-border p-8 relative flex items-center justify-center overflow-hidden min-h-[350px]">
-                 {/* Radar Pulse circles */}
-                 <div className="absolute w-24 h-24 rounded-full border border-emerald-500/30 animate-radar"></div>
-                 <div className="absolute w-24 h-24 rounded-full border border-emerald-500/30 animate-radar [animation-delay:1.5s]"></div>
-                 <div className="absolute w-24 h-24 rounded-full border border-emerald-500/30 animate-radar [animation-delay:3s]"></div>
+              {/* Simulation: SaaS Pipeline Transformation */}
+              <div className="flex-1 w-full bg-slate-50/50 rounded-[3rem] border border-border p-8 relative flex items-center justify-center overflow-hidden min-h-[400px]">
+                 {/* Radial Glow Background */}
+                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent opacity-60"></div>
+                 
+                 {/* Scene 1: The Initial Resume */}
+                 <div className="absolute w-28 h-36 bg-white rounded-lg shadow-md border border-slate-200 p-3 flex flex-col gap-2 z-10 animate-[saasResumeFade_6s_infinite_cubic-bezier(0.25,1,0.5,1)]">
+                    <div className="w-1/2 h-2.5 bg-slate-300 rounded mb-2"></div>
+                    <div className="w-full h-1 bg-slate-200 rounded"></div>
+                    <div className="w-5/6 h-1 bg-slate-200 rounded"></div>
+                    <div className="w-4/5 h-1 bg-slate-200 rounded mb-2"></div>
+                    <div className="w-full h-8 bg-slate-100 rounded mt-auto"></div>
+                 </div>
 
-                 {/* The "Discovery" Spotlight */}
-                 <div className="relative z-10 w-full max-w-md bg-white rounded-3xl shadow-2xl border border-emerald-100 p-6 animate-spotlight">
-                    <div className="flex items-center justify-between mb-6">
-                       <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white">
-                             <TrendingUp className="w-5 h-5" />
-                          </div>
-                          <div>
-                             <h4 className="text-sm font-black uppercase tracking-widest text-emerald-600">Top Match Found</h4>
-                             <p className="text-[10px] text-text-secondary">San Francisco • Remote • $180k+</p>
-                          </div>
-                       </div>
-                       <div className="text-2xl font-black text-emerald-500">98%</div>
-                    </div>
-                    
-                    <div className="relative group/mock">
-                       <div className="h-4 w-full bg-emerald-50 rounded-full mb-3 overflow-hidden">
-                          <div className="h-full bg-emerald-500 w-3/4 animate-pulse"></div>
-                       </div>
-                       <div className="space-y-2">
-                          <div className="h-2 w-full bg-background-tertiary rounded-full"></div>
-                          <div className="h-2 w-2/3 bg-background-tertiary rounded-full"></div>
-                       </div>
+                 {/* Scene 2 & 3: Floating Elements into Portfolio Grid */}
+                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                    {/* Header Card */}
+                    <div className="absolute w-36 h-10 bg-white/90 backdrop-blur-sm rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-slate-100 p-2 flex items-center gap-2"
+                         style={{ '--bx': '0px', '--by': '-60px', '--px': '0px', '--py': '-52px', animation: 'saasCardsBreak 6s infinite cubic-bezier(0.25,1,0.5,1)' } as React.CSSProperties}>
+                       <div className="w-6 h-6 rounded-full bg-indigo-100"></div>
+                       <div className="w-16 h-2 bg-slate-200 rounded"></div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
-                       <span className="text-[10px] font-bold text-text-secondary uppercase">Scanning Global Databases...</span>
-                       <div className="flex -space-x-2">
-                          {[1,2,3].map(i => <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-emerald-100 flex items-center justify-center text-[8px] font-bold">🎯</div>)}
+                    {/* Sidebar / Skills Card */}
+                    <div className="absolute w-12 h-20 bg-white/90 backdrop-blur-sm rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-slate-100 p-2 flex flex-col gap-1.5"
+                         style={{ '--bx': '-60px', '--by': '20px', '--px': '-48px', '--py': '4px', animation: 'saasCardsBreak 6s infinite cubic-bezier(0.25,1,0.5,1)' } as React.CSSProperties}>
+                       <div className="w-full h-2 bg-purple-100 rounded mb-1"></div>
+                       <div className="w-full h-1 bg-slate-100 rounded"></div>
+                       <div className="w-full h-1 bg-slate-100 rounded"></div>
+                       <div className="w-full h-1 bg-slate-100 rounded"></div>
+                    </div>
+
+                    {/* Main Content / Experience Card */}
+                    <div className="absolute w-20 h-20 bg-white/90 backdrop-blur-sm rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.05)] border border-slate-100 p-2 flex flex-col gap-1.5"
+                         style={{ '--bx': '50px', '--by': '30px', '--px': '8px', '--py': '4px', animation: 'saasCardsBreak 6s infinite cubic-bezier(0.25,1,0.5,1)' } as React.CSSProperties}>
+                       <div className="w-2/3 h-2 bg-blue-100 rounded mb-1"></div>
+                       <div className="w-full h-6 bg-slate-50 border border-slate-100 rounded"></div>
+                       <div className="w-full h-3 bg-slate-50 border border-slate-100 rounded"></div>
+                    </div>
+                 </div>
+
+                 {/* Scene 4: Portfolio Container & Distribution Radiance */}
+                 <div className="absolute w-[160px] h-[130px] bg-white/10 border border-indigo-200/50 rounded-2xl z-10 flex items-center justify-center animate-[saasPortfolioBox_6s_infinite_cubic-bezier(0.25,1,0.5,1)]">
+                    <div className="absolute inset-0 rounded-2xl border border-indigo-400 animate-[saasRadiate_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
+                    <div className="absolute inset-0 rounded-2xl border border-purple-400 animate-[saasRadiate_6s_infinite_cubic-bezier(0.25,1,0.5,1)] [animation-delay:0.2s]"></div>
+                 </div>
+
+                 {/* Scene 5: Recruiter Dashboard Overlay */}
+                 <div className="absolute inset-x-6 inset-y-8 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-30 animate-[saasDashboard_6s_infinite_cubic-bezier(0.25,1,0.5,1)] flex flex-col">
+                    {/* Dashboard Topbar */}
+                    <div className="h-8 border-b border-slate-100 flex items-center px-4 justify-between bg-slate-50/50">
+                       <div className="flex gap-1.5">
+                          <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                          <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                          <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                       </div>
+                       <div className="w-16 h-2 bg-slate-200 rounded"></div>
+                    </div>
+                    {/* Dashboard Content */}
+                    <div className="flex-1 flex p-2 gap-2">
+                       {/* Sidebar */}
+                       <div className="w-12 border-r border-slate-100 py-2 flex flex-col gap-2">
+                          <div className="w-full h-1.5 bg-slate-100 rounded"></div>
+                          <div className="w-full h-1.5 bg-slate-100 rounded"></div>
+                          <div className="w-full h-1.5 bg-slate-100 rounded"></div>
+                       </div>
+                       {/* Main Area: Candidate Spotlight */}
+                       <div className="flex-1 rounded-xl bg-indigo-50/50 border border-indigo-100 p-3 relative flex items-start gap-3">
+                          <div className="absolute -top-1.5 -right-1.5 bg-indigo-500 text-white rounded-full p-0.5 shadow-sm">
+                             <Check className="w-3 h-3" />
+                          </div>
+                          <div className="w-10 h-10 rounded-full bg-indigo-200 shrink-0"></div>
+                          <div className="flex-1 space-y-2 mt-1">
+                             <div className="flex justify-between items-center">
+                                <div className="w-1/2 h-2 bg-indigo-300 rounded"></div>
+                                <div className="px-1.5 py-0.5 bg-emerald-100 text-emerald-600 rounded text-[6px] font-bold uppercase tracking-wider">Top Match</div>
+                             </div>
+                             <div className="w-full h-1 bg-slate-200 rounded"></div>
+                             <div className="w-3/4 h-1 bg-slate-200 rounded"></div>
+                             <div className="w-full h-6 bg-white border border-slate-100 rounded mt-2 px-2 py-1">
+                                <div className="h-1 bg-indigo-100 rounded w-1/2 mb-1"></div>
+                                <div className="h-1 bg-indigo-100 rounded w-1/3"></div>
+                             </div>
+                          </div>
                        </div>
                     </div>
                  </div>
