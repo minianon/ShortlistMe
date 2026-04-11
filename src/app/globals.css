@@ -644,3 +644,41 @@ div.theme-mockup-sync {
 .generation-step-2 {
   transform-origin: bottom;
 }
+
+/* ── Hero Component 6-Scene Animation ── */
+
+@keyframes heroLoadBar {
+  0% { width: 0%; opacity: 1; }
+  35% { width: 100%; opacity: 1; }
+  45%, 100% { width: 100%; opacity: 0; }
+}
+
+@keyframes heroAiPulse {
+  0%, 5% { transform: scale(0.5); opacity: 0; border-width: 2px; }
+  15%, 25% { transform: scale(2); opacity: 0.3; border-width: 1px; }
+  40%, 100% { transform: scale(3.5); opacity: 0; border-width: 0px; }
+}
+
+@keyframes heroPulseCenter {
+  0%, 5% { transform: scale(0.5); opacity: 0; }
+  15%, 35% { transform: scale(1); opacity: 1; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+  45%, 100% { transform: scale(0.5); opacity: 0; }
+}
+
+@keyframes heroUiFadeIn {
+  0%, 40% { opacity: 0; transform: translateY(15px) scale(0.98); }
+  50%, 85% { opacity: 1; transform: translateY(0) scale(1); }
+  90%, 100% { opacity: 0; transform: translateY(-10px) scale(0.98); }
+}
+
+@keyframes heroToastPop {
+  0%, 55% { opacity: 0; transform: translateY(20px) scale(0.9) translateX(-50%); }
+  65%, 85% { opacity: 1; transform: translateY(0) scale(1) translateX(-50%); }
+  90%, 100% { opacity: 0; transform: translateY(-10px) scale(0.9) translateX(-50%); }
+}
+
+@keyframes heroBrowserGlow {
+  0%, 50% { box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 rgba(16, 185, 129, 0); }
+  65%, 85% { box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 40px rgba(16, 185, 129, 0.15), 0 0 0 1px rgba(16, 185, 129, 0.2); }
+  90%, 100% { box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 rgba(16, 185, 129, 0); }
+}

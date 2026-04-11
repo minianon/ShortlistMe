@@ -115,29 +115,74 @@ export default function HomePage() {
             </div>
           </div>
           <div className="flex-1 w-full max-w-lg mx-auto lg:max-w-none relative">
-            <div className="aspect-square md:aspect-[4/3] rounded-3xl bg-gradient-to-br from-white to-indigo-50/50 shadow-2xl shadow-indigo-100 border border-background/50 p-6 flex flex-col relative overflow-hidden">
-              {/* Graphic Mockup inside Hero */}
-              <div className="w-full h-4 bg-background-tertiary rounded-full mb-8 relative overflow-hidden">
-                <div className="absolute inset-y-0 left-0 bg-primary-light w-1/3 rounded-full"></div>
-              </div>
-              <div className="flex-1 flex items-center justify-center relative">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--primary-fixed)_0%,transparent_70%)] opacity-20 blur-3xl"></div>
-                {/* Concentric rings */}
-                <div className="w-64 h-64 border border-primary-light rounded-full absolute"></div>
-                <div className="w-48 h-48 border border-primary-light rounded-full absolute"></div>
-                <div className="w-32 h-32 border border-indigo-300 rounded-full absolute"></div>
-                <div className="w-16 h-16 bg-background rounded-full shadow-lg shadow-indigo-200 flex items-center justify-center relative z-10">
-                  <Sparkles className="w-5 h-5 text-primary" />
+            {/* The SaaS Browser Window */}
+            <div className="aspect-square md:aspect-[4/3] rounded-[1.5rem] md:rounded-[2rem] bg-[#0c0c0c] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-0 flex flex-col relative overflow-hidden animate-[heroBrowserGlow_6s_infinite_cubic-bezier(0.25,1,0.5,1)] w-full max-w-[540px] mx-auto transform-gpu transition-all">
+              
+              {/* Browser Header */}
+              <div className="h-10 border-b border-white/5 flex items-center px-4 justify-between bg-white/[0.02] relative z-20">
+                <div className="flex gap-1.5 w-16">
+                  <div className="w-2.5 h-2.5 rounded-full bg-white/10"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-white/10"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-white/10"></div>
                 </div>
-              </div>
-              {/* Floating Badge */}
-              <div className="absolute -bottom-6 -left-6 bg-background rounded-2xl p-4 shadow-xl border border-border flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                  <Check className="w-3.5 h-3.5" />
+                {/* Search / Progress Bar */}
+                <div className="flex-1 max-w-[160px] md:max-w-[200px] h-4 bg-white/5 rounded-full relative overflow-hidden">
+                  <div className="absolute inset-y-0 left-0 bg-emerald-500/30 rounded-full animate-[heroLoadBar_6s_infinite_linear]"></div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-text">Portfolio Ready</p>
-                  <p className="text-xs text-text-secondary">Generated in 4.2s</p>
+                <div className="w-16"></div>
+              </div>
+
+              {/* Main Content Area */}
+              <div className="flex-1 relative flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#111111] to-[#0a0a0a]">
+                
+                {/* Scene 1: AI Processing Center */}
+                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                  <div className="absolute w-16 h-16 rounded-full border border-emerald-500/30 animate-[heroAiPulse_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
+                  <div className="absolute w-16 h-16 rounded-full border border-emerald-500/30 animate-[heroAiPulse_6s_infinite_cubic-bezier(0.25,1,0.5,1)] [animation-delay:0.2s]"></div>
+                  <div className="absolute w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_20px_#10b981] animate-[heroPulseCenter_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
+                </div>
+
+                {/* Scene 2: Portfolio UI Build - Fades In */}
+                <div className="w-full h-full flex flex-col gap-4 animate-[heroUiFadeIn_6s_infinite_cubic-bezier(0.25,1,0.5,1)] relative z-20 opacity-0">
+                  {/* Portfolio Hero Skeleton */}
+                  <div className="w-full h-24 bg-white/5 rounded-xl border border-white/5 flex flex-col items-center justify-center gap-3 p-4">
+                     <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20"></div>
+                     <div className="w-1/3 h-2.5 bg-white/20 rounded-full"></div>
+                     <div className="w-1/2 h-2 bg-white/10 rounded-full"></div>
+                  </div>
+                  
+                  {/* Portfolio Body Grid */}
+                  <div className="flex flex-1 gap-4">
+                     {/* Sidebar Skeleton */}
+                     <div className="w-1/3 h-full bg-white/5 rounded-xl border border-white/5 p-3 flex flex-col gap-2">
+                        <div className="w-full h-2 bg-white/10 rounded-full mb-2"></div>
+                        <div className="w-3/4 h-1.5 bg-white/5 rounded-full"></div>
+                        <div className="w-5/6 h-1.5 bg-white/5 rounded-full"></div>
+                        <div className="w-2/3 h-1.5 bg-white/5 rounded-full"></div>
+                     </div>
+                     {/* Projects Grid Skeleton */}
+                     <div className="flex-1 h-full flex flex-col gap-3">
+                        <div className="flex gap-3 h-1/2">
+                           <div className="flex-1 bg-white/5 rounded-xl border border-white/5 relative overflow-hidden">
+                              <div className="absolute top-2 left-2 w-1/2 h-1.5 bg-white/10 rounded-full"></div>
+                           </div>
+                           <div className="flex-1 bg-emerald-500/5 border border-emerald-500/10 rounded-xl relative overflow-hidden shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]">
+                              <div className="absolute top-2 left-2 w-1/2 h-1.5 bg-emerald-500/30 rounded-full"></div>
+                           </div>
+                        </div>
+                        <div className="flex-1 bg-white/5 rounded-xl border border-white/5 relative overflow-hidden">
+                           <div className="absolute right-0 bottom-0 w-16 h-16 bg-emerald-500/10 rounded-tl-full blur-md"></div>
+                        </div>
+                     </div>
+                  </div>
+                </div>
+
+                {/* Scene 3: Success Toast Popup */}
+                <div className="absolute bottom-6 left-1/2 backdrop-blur-md bg-[#132a21]/90 border border-emerald-500/30 rounded-full px-4 py-2 flex items-center gap-2 z-30 animate-[heroToastPop_6s_infinite_cubic-bezier(0.25,1,0.5,1)] shadow-[0_10px_30px_rgba(16,185,129,0.15)] opacity-0">
+                   <div className="w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center">
+                     <Check className="w-2 h-2 text-[#0c0c0c]" strokeWidth={4} />
+                   </div>
+                   <span className="text-emerald-400 text-[11px] font-bold tracking-wide uppercase">Portfolio Ready</span>
                 </div>
               </div>
             </div>
