@@ -37,6 +37,14 @@
   --auth-text-secondary: #64748b;
   --auth-social-bg: #ffffff;
   --auth-social-border: #e2e8f0;
+
+  /* Dashboard Variables */
+  --dash-sidebar-bg: #ffffff;
+  --dash-sidebar-border: #e8e7e1;
+  --dash-card-bg: #ffffff;
+  --dash-card-border: #e8e7e1;
+  --dash-upload-bg: #f7f6f3;
+  --dash-stat-emerald-bg: rgba(23, 129, 99, 0.06);
 }
 
 :root.dark,
@@ -68,6 +76,14 @@
   --auth-text-secondary: rgba(255, 255, 255, 0.4);
   --auth-social-bg: rgba(255, 255, 255, 0.05);
   --auth-social-border: rgba(255, 255, 255, 0.1);
+
+  /* Dashboard Variables (Dark) */
+  --dash-sidebar-bg: #111110;
+  --dash-sidebar-border: #272725;
+  --dash-card-bg: #1a1a19;
+  --dash-card-border: #333331;
+  --dash-upload-bg: #272725;
+  --dash-stat-emerald-bg: rgba(34, 157, 122, 0.1);
 }
 
 @theme inline {
