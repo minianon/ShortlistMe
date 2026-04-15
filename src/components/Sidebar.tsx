@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useClerk, useUser } from "@clerk/nextjs";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutGrid,
   Briefcase,
   BarChart2,
   Settings,
   LogOut,
-  Sparkles,
-  Zap,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 
 const NAV = [
@@ -24,100 +26,147 @@ export default function Sidebar() {
   const path = usePathname();
   const { signOut } = useClerk();
   const { user } = useUser();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Persistence logic
+  useEffect(() => {
+    setIsMounted(true);
+    const saved = localStorage.getItem("sidebar-collapsed");
+    if (saved) setIsCollapsed(JSON.parse(saved));
+  }, []);
+
+  const toggleCollapse = () => {
+    const next = !isCollapsed;
+    setIsCollapsed(next);
+    localStorage.setItem("sidebar-collapsed", JSON.stringify(next));
+  };
+
+  if (!isMounted) return null;
 
   return (
     <>
       {/* ── Desktop Sidebar ── */}
-      <aside className="hidden md:flex flex-col w-[260px] min-h-[100dvh] bg-[var(--dash-sidebar-bg)] border-r border-[var(--dash-sidebar-border)] p-6 flex-shrink-0 transition-colors duration-300">
+      <motion.aside 
+        initial={false}
+        animate={{ width: isCollapsed ? 80 : 260 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="hidden md:flex flex-col min-h-[100dvh] bg-[var(--dash-sidebar-bg)] border-r border-[var(--dash-sidebar-border)] flex-shrink-0 transition-colors duration-300 relative"
+      >
+        <div className="flex flex-col h-full p-4 lg:p-6 overflow-hidden">
+          {/* Logo & Toggle Section */}
+          <div className={`mb-10 flex ${isCollapsed ? 'flex-col items-center gap-4' : 'items-center justify-between px-2'}`}>
+            <Link
+              href="/dashboard"
+              style={{ fontFamily: "var(--font-display)" }}
+              className="text-xl font-extrabold tracking-tight text-text whitespace-nowrap"
+            >
+              {isCollapsed ? (
+                <span className="text-emerald-500">S<span className="text-text">M</span></span>
+              ) : (
+                <>Shortlist<span className="text-emerald-500">Me</span></>
+              )}
+            </Link>
 
-        {/* Logo */}
-        <div className="mb-10 px-2">
-          <Link
-            href="/dashboard"
-            style={{ fontFamily: "var(--font-display)" }}
-            className="text-xl font-extrabold tracking-tight text-text block"
-          >
-            Shortlist<span className="text-emerald-500">Me</span>
-          </Link>
-          <span className="text-[10px] font-bold tracking-widest uppercase text-emerald-500/70 mt-1 block">
-            AI Portfolio Engine
-          </span>
-        </div>
+            <button
+              onClick={toggleCollapse}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg hover:bg-emerald-500/10 text-text-muted hover:text-emerald-500 transition-all active:scale-95`}
+              title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+              {isCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+            </button>
+          </div>
 
-        {/* Navigation */}
-        <nav className="flex flex-col gap-1 flex-1">
-          {NAV.map(({ href, Icon, label }) => {
-            const isActive = href === "/dashboard"
-              ? path === href
-              : path.startsWith(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-200 group ${
-                  isActive
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                    : "text-text-secondary hover:bg-background-tertiary hover:text-text"
-                }`}
-              >
-                <Icon
-                  className={`w-[18px] h-[18px] flex-shrink-0 transition-all ${
-                    isActive ? "text-emerald-500" : "group-hover:text-text"
-                  }`}
-                  strokeWidth={isActive ? 2.5 : 2}
-                />
-                {label}
-                {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          {!isCollapsed && (
+            <motion.span 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }}
+              className="text-[10px] font-bold tracking-widest uppercase text-emerald-500/70 px-2 mb-4 block whitespace-nowrap"
+            >
+              AI Portfolio Engine
+            </motion.span>
+          )}
+
+          {/* Navigation */}
+          <nav className="flex flex-col gap-1.5 flex-1">
+            {NAV.map(({ href, Icon, label }) => {
+              const isActive = href === "/dashboard"
+                ? path === href
+                : path.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-semibold text-sm transition-all duration-200 group ${
+                    isActive
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      : "text-text-secondary hover:bg-background-tertiary hover:text-text"
+                  } ${isCollapsed ? 'justify-center' : ''}`}
+                  title={isCollapsed ? label : ""}
+                >
+                  <Icon
+                    className={`w-[18px] h-[18px] flex-shrink-0 transition-all ${
+                      isActive ? "text-emerald-500" : "group-hover:text-text"
+                    }`}
+                    strokeWidth={isActive ? 2.5 : 2}
+                  />
+                  {!isCollapsed && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="whitespace-nowrap"
+                    >
+                      {label}
+                    </motion.span>
+                  )}
+                  {isActive && !isCollapsed && (
+                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* User + Logout */}
+          <div className="mt-4 pt-4 border-t border-[var(--dash-sidebar-border)]">
+            <div className={`flex items-center gap-3 ${isCollapsed ? 'flex-col gap-4' : ''}`}>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex-shrink-0 overflow-hidden border border-emerald-500/20">
+                  {user?.imageUrl ? (
+                    <img src={user.imageUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-emerald-500 font-bold text-xs">
+                      {user?.firstName?.[0] ?? "U"}
+                    </div>
+                  )}
+                </div>
+                {!isCollapsed && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex-1 min-w-0"
+                  >
+                    <p className="text-xs font-bold text-text truncate">
+                      {user?.firstName} {user?.lastName}
+                    </p>
+                    <p className="text-[10px] text-text-muted truncate">
+                      {user?.primaryEmailAddress?.emailAddress}
+                    </p>
+                  </motion.div>
                 )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Upgrade Card */}
-        <div className="mt-6 rounded-2xl p-5 bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/20">
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="w-4 h-4 text-emerald-500" strokeWidth={2.5} />
-            <h4 className="text-sm font-bold text-text">Upgrade to Pro</h4>
-          </div>
-          <p className="text-xs text-text-secondary leading-relaxed mb-4">
-            Unlock AI resume tailoring, custom domains, and global analytics.
-          </p>
-          <button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl py-2 text-xs font-bold transition-all shadow-md shadow-emerald-500/20 active:scale-95">
-            Go Premium
-          </button>
-        </div>
-
-        {/* User + Logout */}
-        <div className="mt-4 pt-4 border-t border-[var(--dash-sidebar-border)] flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex-shrink-0 overflow-hidden border border-emerald-500/20">
-            {user?.imageUrl ? (
-              <img src={user.imageUrl} alt="Avatar" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-emerald-500 font-bold text-xs">
-                {user?.firstName?.[0] ?? "U"}
               </div>
-            )}
+              
+              <button
+                onClick={() => signOut({ redirectUrl: "/" })}
+                className={`text-text-muted hover:text-red-500 transition-colors flex-shrink-0 p-1.5 hover:bg-red-500/5 rounded-lg active:scale-90 ${isCollapsed ? 'mt-1' : ''}`}
+                title="Sign out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-text truncate">
-              {user?.firstName} {user?.lastName}
-            </p>
-            <p className="text-[10px] text-text-muted truncate">
-              {user?.primaryEmailAddress?.emailAddress}
-            </p>
-          </div>
-          <button
-            onClick={() => signOut({ redirectUrl: "/" })}
-            className="text-text-muted hover:text-red-500 transition-colors flex-shrink-0"
-            title="Sign out"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
         </div>
-
-      </aside>
+      </motion.aside>
 
       {/* ── Mobile Bottom Bar ── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-[var(--dash-sidebar-border)] flex justify-around p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">

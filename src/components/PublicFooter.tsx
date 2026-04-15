@@ -4,23 +4,49 @@ import { useState } from "react";
 import Link from "next/link";
 import { Link2 } from "lucide-react";
 
-export default function PublicFooter() {
+interface PublicFooterProps {
+  primaryColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  accentTextColor?: string;
+  borderColor?: string;
+}
+
+export default function PublicFooter({ 
+  primaryColor, 
+  backgroundColor,
+  textColor,
+  accentTextColor,
+  borderColor
+}: PublicFooterProps) {
   const [isTeamCanvasOpen, setIsTeamCanvasOpen] = useState(false);
+  const isThemed = !!primaryColor || !!backgroundColor;
+  const themeColor = primaryColor || "#10b981";
+
+  // Dynamic Styles
+  const footerStyle = {
+    backgroundColor: backgroundColor || undefined,
+    color: textColor || undefined,
+    borderColor: borderColor || undefined
+  };
 
   return (
     <>
       {/* ── Footer ── */}
-      <footer className="border-t border-border bg-background-secondary py-16">
+      <footer 
+        className={`border-t py-16 ${!backgroundColor ? "bg-background-secondary border-border" : ""}`}
+        style={footerStyle}
+      >
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-10">
           <div className="flex flex-col items-center md:items-start gap-4">
             <Link
               href="/"
               style={{ fontFamily: "var(--font-display)" }}
-              className="font-extrabold text-2xl tracking-tighter text-text"
+              className="font-extrabold text-2xl tracking-tighter"
             >
-              Shortlist<span className="text-emerald-500">Me</span>
+              Shortlist<span className={isThemed ? "" : "text-emerald-500"} style={isThemed ? { color: themeColor } : {}}>Me</span>
             </Link>
-            <p className="text-text-secondary max-w-xs text-sm leading-relaxed font-medium text-center md:text-left">
+            <p className="max-w-xs text-sm leading-relaxed font-medium text-center md:text-left opacity-70">
               The world's most advanced AI-powered portfolio engine. Turn years of experience into a masterpiece in seconds.
             </p>
           </div>
@@ -28,11 +54,16 @@ export default function PublicFooter() {
           <div className="flex flex-col items-center md:items-end gap-4">
             <button
               onClick={() => setIsTeamCanvasOpen(true)}
-              className="px-6 py-3 bg-background border border-border hover:bg-background-tertiary rounded-2xl text-text font-bold text-sm transition-all active:scale-95 shadow-md"
+              className="px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg active:scale-95"
+              style={{ 
+                backgroundColor: themeColor, 
+                color: accentTextColor || textColor || "#ffffff",
+                boxShadow: `0 10px 15px -3px ${themeColor}33` 
+              }}
             >
               Meet the Team
             </button>
-            <p className="text-text-muted text-[10px] font-bold uppercase tracking-[0.2em] mt-2">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] mt-2 opacity-50">
               © 2026 ShortlistMe. All rights reserved.
             </p>
           </div>
@@ -48,20 +79,30 @@ export default function PublicFooter() {
             onClick={() => setIsTeamCanvasOpen(false)}
           ></div>
 
-          <div className="relative w-full max-w-6xl h-[85vh] sm:h-auto bg-background/95 backdrop-blur-3xl shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 fade-in duration-500 flex flex-col border border-border rounded-t-[2.5rem] sm:rounded-3xl md:rounded-[5rem] rounded-b-none sm:rounded-b-3xl md:rounded-b-[5rem] overflow-hidden">
+          <div 
+            className="relative w-full max-w-6xl h-[85vh] sm:h-auto shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 fade-in duration-500 flex flex-col border rounded-t-[2.5rem] sm:rounded-3xl md:rounded-[5rem] rounded-b-none sm:rounded-b-3xl md:rounded-b-[5rem] overflow-hidden"
+            style={{ 
+              backgroundColor: backgroundColor ? backgroundColor : "rgba(var(--background), 0.95)", 
+              borderColor: borderColor || "var(--border)",
+              backdropFilter: "blur(20px)"
+            }}
+          >
             {/* Mobile Drag Handle */}
             <div className="w-12 h-1.5 bg-border-strong rounded-full mx-auto mt-4 mb-2 md:hidden"></div>
 
             <div className="px-6 py-4 md:p-14 md:pb-8 flex items-center justify-between">
               <div>
-                <h2 className="text-xl md:text-5xl font-black font-display text-text tracking-tighter">
-                  Our <span className="text-emerald-500 italic">Makers</span>
+                <h2 className="text-xl md:text-5xl font-black font-display tracking-tighter" style={{ color: textColor }}>
+                  Our <span className={`italic ${isThemed ? "" : "text-emerald-500"}`} style={isThemed ? { color: themeColor } : {}}>Makers</span>
                 </h2>
-                <p className="text-text-muted text-[9px] md:text-[11px] font-bold uppercase tracking-[0.4em] mt-1 md:mt-3">Merging creativity with silicon</p>
+                <p className="text-[9px] md:text-[11px] font-bold uppercase tracking-[0.4em] mt-1 md:mt-3 opacity-60" style={{ color: textColor }}>Merging creativity with silicon</p>
               </div>
               <button
                 onClick={() => setIsTeamCanvasOpen(false)}
-                className="w-8 h-8 md:w-14 md:h-14 rounded-full bg-background-tertiary border border-border flex items-center justify-center text-text-muted hover:text-white hover:bg-emerald-500 transition-all active:scale-90"
+                className={`w-8 h-8 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-all active:scale-90 ${isThemed ? "bg-white/5 border border-white/10" : "bg-background-tertiary border border-border hover:bg-emerald-500"}`}
+                style={textColor ? { color: textColor } : {}}
+                onMouseEnter={isThemed ? (e) => (e.currentTarget.style.backgroundColor = themeColor) : undefined}
+                onMouseLeave={isThemed ? (e) => (e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)") : undefined}
                 aria-label="Close"
               >
                 <span className="text-xs md:text-base">✕</span>
@@ -80,10 +121,18 @@ export default function PublicFooter() {
                   href={member.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group relative flex flex-row md:flex-col items-center md:items-stretch rounded-2xl md:rounded-[3rem] overflow-hidden border border-border bg-background bg-opacity-50 p-2 md:p-3 transition-all hover:border-emerald-500/30 hover:shadow-[0_20px_50px_rgba(16,185,129,0.1)] active:scale-[0.98]"
+                  className={`group relative flex flex-row md:flex-col items-center md:items-stretch rounded-2xl md:rounded-[3rem] overflow-hidden border p-2 md:p-3 transition-all active:scale-[0.98] ${isThemed ? "bg-white/5 border-white/5" : "bg-background-tertiary border-border hover:border-emerald-500/30 hover:shadow-[0_20px_50px_rgba(16,185,129,0.1)]"}`}
+                  onMouseEnter={isThemed ? (e) => {
+                    e.currentTarget.style.borderColor = `${themeColor}4d`;
+                    e.currentTarget.style.boxShadow = `0 20px 50px ${themeColor}1a`;
+                  } : undefined}
+                  onMouseLeave={isThemed ? (e) => {
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
+                    e.currentTarget.style.boxShadow = "";
+                  } : undefined}
                 >
                   {/* Portrait Area / Avatar */}
-                  <div className="w-16 h-16 md:w-full md:aspect-[3/4] md:min-h-[280px] relative overflow-hidden rounded-xl md:rounded-2xl flex-shrink-0 bg-background-tertiary md:p-2">
+                  <div className="w-16 h-16 md:w-full md:aspect-[3/4] md:min-h-[280px] relative overflow-hidden rounded-xl md:rounded-2xl flex-shrink-0 bg-background-tertiary/50 md:p-2">
                     <img
                       src={`/team/${member.name.toLowerCase().replace(/ /g, '-')}.jpeg`}
                       alt={member.name}
@@ -95,31 +144,34 @@ export default function PublicFooter() {
 
                     {/* Status Badge - Dot Only */}
                     <div className="absolute top-1 left-1 md:top-4 md:left-4 flex items-center justify-center p-1 md:p-1.5 rounded-full bg-background/80 backdrop-blur-md border border-border shadow-sm">
-                      <div className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                      <div className={`w-1.5 md:w-2 h-1.5 md:h-2 rounded-full animate-pulse ${isThemed ? "" : "bg-emerald-500"}`} style={isThemed ? { backgroundColor: themeColor } : {}}></div>
                     </div>
                   </div>
 
                   {/* Name Info Section */}
                   <div className="flex-1 md:flex-none p-3 md:p-5 text-left md:text-center">
-                    <h3 className="font-bold text-text text-sm md:text-xl tracking-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                      {member.name.split(' ')[0]} <span className="md:hidden"> </span> <span className="text-text-secondary md:block text-xs md:text-lg">{member.name.split(' ')[1]}</span>
+                    <h3 className={`font-bold text-sm md:text-xl tracking-tight transition-colors ${isThemed ? "" : "group-hover:text-emerald-500"}`}
+                        onMouseEnter={isThemed ? (e) => (e.currentTarget.style.color = themeColor) : undefined}
+                        onMouseLeave={isThemed ? (e) => (e.currentTarget.style.color = "") : undefined}
+                    >
+                      {member.name.split(' ')[0]} <span className="md:hidden"> </span> <span className="opacity-60 md:block text-xs md:text-lg">{member.name.split(' ')[1]}</span>
                     </h3>
                   </div>
 
                   {/* External Link Icon Hover Layer (Desktop only for visibility) */}
-                  <div className="absolute top-6 right-6 w-10 h-10 rounded-full bg-background/80 backdrop-blur-md border border-border hidden md:flex items-center justify-center text-text-muted opacity-0 group-hover:opacity-100 transition-opacity scale-90 group-hover:scale-100 duration-300 shadow-sm">
-                    <Link2 className="w-4 h-4" />
+                  <div className="absolute top-6 right-6 w-10 h-10 rounded-full bg-black/20 backdrop-blur-md border border-white/10 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity scale-90 group-hover:scale-100 duration-300 shadow-sm">
+                    <Link2 className="w-4 h-4 text-white" />
                   </div>
                 </a>
               ))}
             </div>
 
             <div className="p-4 md:p-14 pt-0 mt-auto">
-              <div className="flex flex-col items-center justify-center gap-3 text-center border-t border-border pt-6 md:pt-10">
-                <p className="text-xs md:text-sm text-text font-bold uppercase tracking-[0.2em]">
+              <div className="flex flex-col items-center justify-center gap-3 text-center border-t border-white/10 pt-6 md:pt-10">
+                <p className="text-xs md:text-sm font-bold uppercase tracking-[0.2em] opacity-80">
                   Our Mission
                 </p>
-                <p className="text-xs md:text-sm text-text-secondary font-medium leading-relaxed max-w-lg">
+                <p className="text-xs md:text-sm font-medium leading-relaxed max-w-lg opacity-60">
                   Engineering the next generation of professional representation through advanced generative AI and purpose-driven interaction design.
                 </p>
               </div>
@@ -130,4 +182,3 @@ export default function PublicFooter() {
     </>
   );
 }
-

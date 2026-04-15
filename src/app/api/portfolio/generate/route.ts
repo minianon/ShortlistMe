@@ -1,4 +1,5 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 import { supabaseAdmin } from "@/server/supabase";
@@ -146,17 +147,27 @@ ${resumeText.slice(0, 8000)}`;
     }
   }
 
-  // 5. Derive slug from parsed name or Clerk user name
+  // 5. Derive slug from claimed cookie, parsed name, or Clerk user name
+  const cookieStore = await cookies();
+  const preferredSlug = cookieStore.get("claimed_slug")?.value;
+
   const parsedName = (portfolioData.name as string | null) ??
     `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim();
-  const baseSlug = slugify(parsedName) || userId.slice(0, 8);
+  
+  const baseSlug = preferredSlug || slugify(parsedName) || userId.slice(0, 8);
 
-  // Ensure slug uniqueness by checking the DB
+  // Ensure slug uniqueness by checking the DB (Case-Insensitive)
   let slug = baseSlug;
   let attempt = 0;
   while (true) {
     const existing = await prisma.portfolio.findFirst({
-      where: { slug, NOT: { userId: dbUser.id } },
+      where: { 
+        slug: {
+          equals: slug,
+          mode: 'insensitive'
+        }, 
+        NOT: { userId: dbUser.id } 
+      },
       select: { id: true },
     });
     if (!existing) break;
@@ -186,6 +197,11 @@ ${resumeText.slice(0, 8000)}`;
     where: { id: portfolio.id },
     data: { publishedVersionId: version.id },
   });
+
+  // 8. Clean up claimed slug cookie if it was used
+  if (preferredSlug) {
+    (await cookies()).delete("claimed_slug");
+  }
 
   return NextResponse.json({ ok: true, slug: portfolio.slug });
 }
