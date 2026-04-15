@@ -659,6 +659,10 @@ div.theme-mockup-sync {
   85%, 100% { opacity: 0; }
 }
 
+.animate-ig-scanner {
+  animation: igScanner 3s infinite linear;
+}
+
 .analytics-graph-sync {
   animation: analyticsGrowth 5s infinite linear !important;
   transform-origin: left;

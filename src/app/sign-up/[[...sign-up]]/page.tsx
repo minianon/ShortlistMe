@@ -2,6 +2,8 @@
 
 import { SignUp } from "@clerk/nextjs";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, Suspense } from "react";
 import { ChevronLeft, Sparkles, ShieldCheck } from "lucide-react";
 
 export default function SignUpPage() {
@@ -53,17 +55,9 @@ export default function SignUpPage() {
 
           {/* Clerk SignUp (Styling handled globally in globals.css) */}
           <div className="clerk-theme-provider">
-            <SignUp
-              routing="path"
-              path="/sign-up"
-              signInUrl="/sign-in"
-              appearance={{
-                variables: {
-                  colorPrimary: "#10b981",
-                  fontFamily: "var(--font-body)",
-                }
-              }}
-            />
+            <Suspense fallback={<div className="h-64 flex items-center justify-center text-emerald-500 animate-pulse font-bold">Loading secure portal...</div>}>
+              <SignUpContent />
+            </Suspense>
           </div>
         </div>
 
@@ -75,5 +69,31 @@ export default function SignUpPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SignUpContent() {
+  const searchParams = useSearchParams();
+  const slug = searchParams.get("slug");
+
+  useEffect(() => {
+    if (slug) {
+      // Store preferred slug in cookie for 1 hour
+      document.cookie = `claimed_slug=${slug}; path=/; max-age=3600; SameSite=Lax`;
+    }
+  }, [slug]);
+
+  return (
+    <SignUp
+      routing="path"
+      path="/sign-up"
+      signInUrl="/sign-in"
+      appearance={{
+        variables: {
+          colorPrimary: "#10b981",
+          fontFamily: "var(--font-body)",
+        }
+      }}
+    />
   );
 }

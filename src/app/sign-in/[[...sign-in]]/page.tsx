@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { SignIn } from "@clerk/nextjs";
 import Link from "next/link";
 import { ChevronLeft, Sparkles, ShieldCheck } from "lucide-react";
@@ -15,8 +17,8 @@ export default function SignInPage() {
       <div className="w-full max-w-[1200px] flex flex-col items-center relative z-10">
         {/* Navigation */}
         <div className="w-full max-w-md mb-8 flex items-center justify-between animate-fade-up" style={{ animationDelay: "100ms" }}>
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="flex items-center gap-2 text-text-muted hover:text-emerald-500 transition-all font-medium text-sm group"
           >
             <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center shadow-sm group-hover:border-emerald-500/50 group-hover:bg-emerald-500/10 transition-all">
@@ -31,7 +33,7 @@ export default function SignInPage() {
         </div>
 
         {/* Auth Card Container */}
-        <div 
+        <div
           className="w-full max-w-md bg-[var(--auth-glass-bg)] backdrop-blur-3xl border border-[var(--auth-glass-border)] rounded-[2.5rem] p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05),0_40px_100px_rgba(0,0,0,0.05)] dark:shadow-[0_40px_100px_rgba(0,0,0,0.8)] animate-fade-up"
           style={{ animationDelay: "200ms" }}
         >
@@ -40,7 +42,7 @@ export default function SignInPage() {
             <div className="inline-flex items-center justify-center p-3 bg-emerald-500/10 rounded-2xl mb-6 shadow-[inset_0_0_20px_rgba(16,185,129,0.1)] ring-1 ring-emerald-500/20">
               <Sparkles className="w-6 h-6 text-emerald-500" strokeWidth={2.5} />
             </div>
-            <h1 
+            <h1
               style={{ fontFamily: "var(--font-display)" }}
               className="text-3xl font-black text-text tracking-tight mb-3"
             >
@@ -53,17 +55,9 @@ export default function SignInPage() {
 
           {/* Clerk SignIn (Styling handled globally in globals.css) */}
           <div className="clerk-theme-provider">
-            <SignIn
-              routing="path"
-              path="/sign-in"
-              signUpUrl="/sign-up"
-              appearance={{
-                variables: {
-                  colorPrimary: "#10b981",
-                  fontFamily: "var(--font-body)",
-                }
-              }}
-            />
+            <Suspense fallback={<div className="h-64 flex items-center justify-center text-emerald-500 animate-pulse font-bold">Loading secure portal...</div>}>
+              <SignInContent />
+            </Suspense>
           </div>
         </div>
 
@@ -75,5 +69,31 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SignInContent() {
+  const searchParams = useSearchParams();
+  const slug = searchParams.get("slug");
+
+  useEffect(() => {
+    if (slug) {
+      // Store preferred slug in cookie for 1 hour
+      document.cookie = `claimed_slug=${slug}; path=/; max-age=3600; SameSite=Lax`;
+    }
+  }, [slug]);
+
+  return (
+    <SignIn
+      routing="path"
+      path="/sign-in"
+      signUpUrl="/sign-up"
+      appearance={{
+        variables: {
+          colorPrimary: "#10b981",
+          fontFamily: "var(--font-body)",
+        }
+      }}
+    />
   );
 }

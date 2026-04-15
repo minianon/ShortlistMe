@@ -165,47 +165,40 @@ export default function DashboardHome() {
   const portfolioSlug = generatedSlug ?? portfolio?.slug;
 
   return (
-    <div className="flex flex-col gap-8 max-w-6xl">
+    <div className="flex flex-col gap-8 max-w-[1700px] mx-auto px-6 md:px-12 lg:px-16 xl:px-24 pb-12">
 
-      {/* ── WELCOME BANNER ── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-400 p-8 md:p-10 shadow-xl shadow-emerald-500/20">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-white/10 rounded-full blur-3xl translate-x-1/3 -translate-y-1/3 pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-black/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 opacity-5 pointer-events-none"
-          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "24px 24px" }}
-        />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div>
-            <p className="text-emerald-100/80 text-xs font-bold uppercase tracking-[0.2em] mb-2">Welcome back</p>
-            <h1 className="text-3xl md:text-4xl font-black text-white mb-2" style={{ fontFamily: "var(--font-display)" }}>
-              Hey, {firstName}! 👋
-            </h1>
-            <p className="text-emerald-100/80 text-sm font-medium max-w-sm">
-              {isPublished
-                ? "Your portfolio is live and looking great."
-                : "Upload your resume to generate your AI-powered portfolio."}
-            </p>
-          </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isProcessing}
-              className="flex items-center gap-2 bg-white text-emerald-700 hover:bg-emerald-50 px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg transition-all active:scale-95 disabled:opacity-60"
+      {/* ── HEADER ── */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 animate-fade-in">
+        <div className="flex-1">
+          <h1 className="text-4xl font-black text-text tracking-tight mb-2" style={{ fontFamily: "var(--font-display)" }}>
+            Dashboard<span className="text-emerald-500">.</span>
+          </h1>
+          <p className="text-text-secondary font-medium outline-none">
+            {isPublished
+              ? "Your professional engine is live and performing."
+              : "Upload your resume to generate your AI-powered portfolio."}
+          </p>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isProcessing}
+            className="flex items-center gap-2 bg-emerald-500 text-white hover:bg-emerald-600 px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-60"
+          >
+            <UploadCloud className="w-4 h-4" />
+            Update Resume
+          </button>
+          {isPublished && portfolioSlug && (
+            <Link
+              href={`/${portfolioSlug}`}
+              target="_blank"
+              className="flex items-center gap-2 bg-background border border-border hover:bg-background-tertiary text-text px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
             >
-              <UploadCloud className="w-4 h-4" />
-              Upload Resume
-            </button>
-            {isPublished && portfolioSlug && (
-              <Link
-                href={`/p/${portfolioSlug}`}
-                target="_blank"
-                className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all"
-              >
-                <ExternalLink className="w-4 h-4" />
-                View Portfolio
-              </Link>
-            )}
-          </div>
+              <ExternalLink className="w-4 h-4" />
+              View Live
+            </Link>
+          )}
         </div>
       </div>
 
@@ -227,11 +220,11 @@ export default function DashboardHome() {
             <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
             <div>
               <p className="text-sm font-bold text-text">Portfolio generated successfully!</p>
-              <p className="text-xs text-text-secondary">Your portfolio is now live at /p/{portfolioSlug}</p>
+              <p className="text-xs text-text-secondary">Your portfolio is now live at /{portfolioSlug}</p>
             </div>
           </div>
           <Link
-            href={`/p/${portfolioSlug}`}
+            href={`/${portfolioSlug}`}
             target="_blank"
             className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-all flex-shrink-0"
           >
@@ -436,12 +429,12 @@ export default function DashboardHome() {
               </div>
               <div>
                 <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-0.5">Portfolio Live</p>
-                <p className="text-sm font-bold text-text">/p/{portfolioSlug}</p>
+                <p className="text-sm font-bold text-text">/{portfolioSlug}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Link
-                href={`/p/${portfolioSlug}`}
+                href={`/${portfolioSlug}`}
                 target="_blank"
                 className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95"
               >

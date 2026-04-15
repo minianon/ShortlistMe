@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
+  provider = "postgresql"
 }
 
 model User {
@@ -19,10 +19,28 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  resumes    Resume[]
-  portfolio  Portfolio?
+  resumes       Resume[]
+  portfolio     Portfolio?
+  notifications Notification[]
 
   @@index([clerkUserId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // e.g., "engagement", "milestone", "system"
+  icon      String   // e.g., "MousePointer2", "CheckCircle2", "TrendingUp"
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
 }
 
 model Resume {
@@ -45,14 +63,46 @@ model Portfolio {
   userId             String           @unique
   slug               String           @unique
   publishedVersionId String?          @unique
+  isPublic           Boolean          @default(true)
   createdAt          DateTime         @default(now())
   updatedAt          DateTime         @updatedAt
 
   user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   versions         PortfolioVersion[]
   publishedVersion PortfolioVersion? @relation("PublishedVersion", fields: [publishedVersionId], references: [id])
+  analytics        AnalyticsVisit[]
+  linkClicks       LinkClick[]
 
   @@index([slug])
+}
+
+model AnalyticsVisit {
+  id          String   @id @default(cuid())
+  portfolioId String
+  viewerIp    String?  // Hashed or masked for privacy
+  userAgent   String?
+  referer     String?
+  path            String   @default("/")
+  createdAt       DateTime @default(now())
+  durationSeconds Int      @default(0)
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId])
+  @@index([createdAt])
+}
+
+model LinkClick {
+  id          String   @id @default(cuid())
+  portfolioId String
+  linkType    String   // e.g. "email_cta", "email_header", "project_link", "social"
+  linkUrl     String?
+  createdAt   DateTime @default(now())
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId])
+  @@index([createdAt])
 }
 
 model PortfolioVersion {
