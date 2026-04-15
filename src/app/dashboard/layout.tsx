@@ -3,8 +3,8 @@
 import Sidebar from "@/components/Sidebar";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useUser } from "@clerk/nextjs";
-import { Bell, CheckCircle2, Globe, MousePointer2, TrendingUp, Zap, Trophy, Star } from "lucide-react";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { Bell, CheckCircle2, Globe, MousePointer2, TrendingUp, Zap, Trophy, Star, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect, useCallback, Suspense } from "react";
 
 interface Notification {
   id: string;
@@ -215,7 +215,13 @@ export default function DashboardLayout({
         {/* ── Page Content ── */}
         <div className="flex-1 overflow-y-auto flex flex-col">
           <main className="flex-1 p-6 lg:p-8 pt-6 pb-24 md:pb-8">
-            {children}
+            <Suspense fallback={
+              <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+              </div>
+            }>
+              {children}
+            </Suspense>
           </main>
           <PublicFooter />
         </div>

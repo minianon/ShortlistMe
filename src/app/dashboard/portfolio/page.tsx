@@ -47,6 +47,7 @@ import {
 } from "@/lib/portfolio-utils";
 import PublicFooter from "@/components/PublicFooter";
 import { SkillTagInput } from "@/components/portfolio/SkillTagInput";
+import DashboardErrorBoundary from "@/components/DashboardErrorBoundary";
 
 // ── Main Page Component ───────────────────────────────
 
@@ -202,7 +203,8 @@ export default function PortfolioManagement() {
             </div>
 
             {/* ── Main View Container ── */}
-            <div className="flex flex-col xl:flex-row gap-8 transition-all duration-500">
+            <DashboardErrorBoundary>
+               <div className="flex flex-col xl:flex-row gap-8 transition-all duration-500">
 
                {/* LEFT: EDITOR (Only in Edit Mode) */}
                {isEditing && (
@@ -760,7 +762,7 @@ export default function PortfolioManagement() {
                                                 onClick={() => {
                                                    const next = [...(draftData.projects || [])];
                                                    next[idx] = { ...next[idx], imageUrl: undefined };
-                                                   setDraftData({ ...draftData, projects: next });
+                                                   setDraftData(prev => prev ? { ...prev, projects: next } : null);
                                                 }}
                                                 className="p-2.5 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-red-100 backdrop-blur-md transition-all border border-red-500/20 shadow-xl"
                                              >
@@ -993,6 +995,7 @@ export default function PortfolioManagement() {
                </div>
 
             </div>
+            </DashboardErrorBoundary>
          </div>
       </div>
    );
