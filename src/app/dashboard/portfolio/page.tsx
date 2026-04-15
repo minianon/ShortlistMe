@@ -61,6 +61,8 @@ export default function PortfolioManagement() {
    const [state, setState] = useState<PreviewState | null>(null);
    const [draftData, setDraftData] = useState<PortfolioData | null>(null);
 
+   const isCloudinaryConfigured = !!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
    const [loading, setLoading] = useState(true);
    const [publishing, setPublishing] = useState(false);
    const [isEditing, setIsEditing] = useState(false);
@@ -273,7 +275,7 @@ export default function PortfolioManagement() {
                                        <div className="w-5 h-5 rounded-full border border-border shadow-sm animate-pulse" style={{ backgroundColor: draftData.customColor || '#10b981' }} />
                                     ) : (
                                        <Plus className="w-4 h-4 text-text-muted" />
-                                    )}
+                                     )}
                                  </div>
                                  <span
                                     className={`text-[9px] font-bold uppercase tracking-wider ${draftData.themeId === "custom" ? '' : 'text-text-muted'}`}
@@ -340,31 +342,41 @@ export default function PortfolioManagement() {
                                        <>
                                           <img src={draftData.photoUrl} className="w-full h-full object-cover" alt="Profile" />
                                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/profile:opacity-100 transition-all flex items-center justify-center gap-2 backdrop-blur-[2px] rounded-3xl">
-                                             <CldUploadWidget
-                                                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"}
-                                                options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme" }}
-                                                onSuccess={(result: any) => {
-                                                   const url = result.info?.derived?.[0]?.secure_url || result.info?.secure_url;
-                                                   if (url) lastUploadedUrlRef.current = url;
-                                                }}
-                                                onClose={() => {
-                                                   if (lastUploadedUrlRef.current) {
-                                                      setDraftData(prev => prev ? { ...prev, photoUrl: lastUploadedUrlRef.current! } : null);
-                                                      lastUploadedUrlRef.current = null;
-                                                   }
-                                                }}
-                                                onError={(error: any) => console.error('Profile Upload Error:', error)}
-                                             >
-                                                {({ open }) => (
-                                                   <button
-                                                      onClick={() => open()}
-                                                      className="p-2 bg-white/10 hover:bg-white/20 rounded-xl text-white backdrop-blur-md transition-all border border-white/20 shadow-xl"
-                                                      title="Change Photo"
-                                                   >
-                                                      <PenTool className="w-4 h-4" />
-                                                   </button>
-                                                )}
-                                             </CldUploadWidget>
+                                             isCloudinaryConfigured ? (
+                                                <CldUploadWidget
+                                                   uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"}
+                                                   options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme" }}
+                                                   onSuccess={(result: any) => {
+                                                      const url = result.info?.derived?.[0]?.secure_url || result.info?.secure_url;
+                                                      if (url) lastUploadedUrlRef.current = url;
+                                                   }}
+                                                   onClose={() => {
+                                                      if (lastUploadedUrlRef.current) {
+                                                         setDraftData(prev => prev ? { ...prev, photoUrl: lastUploadedUrlRef.current! } : null);
+                                                         lastUploadedUrlRef.current = null;
+                                                      }
+                                                   }}
+                                                   onError={(error: any) => console.error('Profile Upload Error:', error)}
+                                                >
+                                                   {({ open }) => (
+                                                      <button
+                                                         onClick={() => open()}
+                                                         className="p-2 bg-white/10 hover:bg-white/20 rounded-xl text-white backdrop-blur-md transition-all border border-white/20 shadow-xl"
+                                                         title="Change Photo"
+                                                      >
+                                                         <PenTool className="w-4 h-4" />
+                                                      </button>
+                                              )}
+                                                </CldUploadWidget>
+                                             ) : (
+                                                <button
+                                                   onClick={() => alert("Cloudinary is not configured. Please set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME in your environment.")}
+                                                   className="p-2 bg-white/10 hover:bg-white/20 rounded-xl text-white backdrop-blur-md transition-all border border-white/20 shadow-xl"
+                                                   title="Cloudinary Not Configured"
+                                                >
+                                                   <Upload className="w-4 h-4" />
+                                                </button>
+                                           )
                                              <button
                                                 onClick={() => setDraftData({ ...draftData, photoUrl: null })}
                                                 className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-red-100 backdrop-blur-md transition-all border border-red-500/20 shadow-xl"
@@ -375,34 +387,43 @@ export default function PortfolioManagement() {
                                           </div>
                                        </>
                                     ) : (
-                                       <CldUploadWidget
-                                          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"}
-                                          options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme" }}
-                                          onSuccess={(result: any) => {
-                                             const url = result.info?.derived?.[0]?.secure_url || result.info?.secure_url;
-                                             if (url) lastUploadedUrlRef.current = url;
-                                          }}
-                                          onClose={() => {
-                                             if (lastUploadedUrlRef.current) {
-                                                setDraftData(prev => prev ? { ...prev, photoUrl: lastUploadedUrlRef.current! } : null);
-                                                lastUploadedUrlRef.current = null;
-                                             }
-                                          }}
-                                          onError={(error: any) => console.error('Profile Upload Error:', error)}
-                                       >
-                                          {({ open }) => (
-                                             <button
-                                                onClick={() => open()}
-                                                className="w-full h-full flex flex-col items-center justify-center gap-2 text-text-muted hover:text-emerald-500 transition-colors"
-                                             >
-                                                <div className="p-3 bg-background-secondary rounded-xl group-hover:scale-110 transition-transform">
-                                                   <ImageIcon className="w-6 h-6" />
-                                                </div>
-                                                <span className="text-[10px] font-black uppercase tracking-widest">Upload Photo</span>
-                                             </button>
-                                          )}
-                                       </CldUploadWidget>
-                                    )}
+                                       isCloudinaryConfigured ? (
+                                          <CldUploadWidget
+                                             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"}
+                                             options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme" }}
+                                             onSuccess={(result: any) => {
+                                                const url = result.info?.derived?.[0]?.secure_url || result.info?.secure_url;
+                                                if (url) lastUploadedUrlRef.current = url;
+                                             }}
+                                             onClose={() => {
+                                                if (lastUploadedUrlRef.current) {
+                                                   setDraftData(prev => prev ? { ...prev, photoUrl: lastUploadedUrlRef.current! } : null);
+                                                   lastUploadedUrlRef.current = null;
+                                                }
+                                             }}
+                                             onError={(error: any) => console.error('Profile Upload Error:', error)}
+                                          >
+                                             {({ open }) => (
+                                                <button
+                                                   onClick={() => open()}
+                                                   className="w-full h-full flex flex-col items-center justify-center gap-2 text-text-muted hover:text-emerald-500 transition-colors"
+                                                >
+                                                   <div className="p-3 bg-background-secondary rounded-xl group-hover:scale-110 transition-transform">
+                                                      <ImageIcon className="w-6 h-6" />
+                                                   </div>
+                                                   <span className="text-[10px] font-black uppercase tracking-widest">Upload Photo</span>
+                                                </button>
+                                              )}
+                                          </CldUploadWidget>
+                                       ) : (
+                                          <div className="flex flex-col items-center gap-2 p-4 text-center">
+                                             <div className="p-3 bg-red-500/10 rounded-xl text-red-500">
+                                                <ImageIcon className="w-6 h-6" />
+                                             </div>
+                                             <p className="text-[9px] font-black uppercase tracking-widest text-red-500">Cloudinary Missing</p>
+                                          </div>
+                                        )
+                                     )}
                                  </div>
                                  <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center shadow-lg border-2 border-background">
                                     <Camera className="w-3 h-3 text-white" />
@@ -719,45 +740,54 @@ export default function PortfolioManagement() {
                                           <>
                                              <img src={proj.imageUrl} className="w-full h-full object-cover" alt="Project Preview" />
                                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
-                                             <CldUploadWidget 
-                                                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"}
-                                                options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme" }}
-                                                onSuccess={(result: any) => {
-                                                   const url = (result.info as any)?.secure_url || (result.info as any)?.url;
-                                                   if (url) {
-                                                      lastUploadedUrlRef.current = url;
-                                                      pendingProjectIdxRef.current = idx;
-                                                   }
-                                                }}
-                                                onClose={() => {
-                                                   if (lastUploadedUrlRef.current && pendingProjectIdxRef.current !== null) {
-                                                      const targetIdx = pendingProjectIdxRef.current;
-                                                      const targetUrl = lastUploadedUrlRef.current;
-                                                      setDraftData(prev => {
-                                                         if (!prev) return null;
-                                                         const nextProjects = [...(prev.projects || [])];
-                                                         if (nextProjects[targetIdx]) {
-                                                            nextProjects[targetIdx] = { 
-                                                               ...nextProjects[targetIdx], 
-                                                               imageUrl: targetUrl 
-                                                            };
-                                                         }
-                                                         return { ...prev, projects: nextProjects };
-                                                      });
-                                                      lastUploadedUrlRef.current = null;
-                                                      pendingProjectIdxRef.current = null;
-                                                   }
-                                                }}
-                                             >
-                                                {({ open }) => (
-                                                   <button 
-                                                      onClick={() => open()}
-                                                      className="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white backdrop-blur-md transition-all border border-white/20 shadow-xl"
-                                                   >
-                                                      <PenTool className="w-4 h-4" />
-                                                   </button>
-                                                )}
-                                             </CldUploadWidget>
+                                             isCloudinaryConfigured ? (
+                                                <CldUploadWidget 
+                                                   uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"}
+                                                   options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme" }}
+                                                   onSuccess={(result: any) => {
+                                                      const url = (result.info as any)?.secure_url || (result.info as any)?.url;
+                                                      if (url) {
+                                                         lastUploadedUrlRef.current = url;
+                                                         pendingProjectIdxRef.current = idx;
+                                                      }
+                                                   }}
+                                                   onClose={() => {
+                                                      if (lastUploadedUrlRef.current && pendingProjectIdxRef.current !== null) {
+                                                         const targetIdx = pendingProjectIdxRef.current;
+                                                         const targetUrl = lastUploadedUrlRef.current;
+                                                         setDraftData(prev => {
+                                                            if (!prev) return null;
+                                                            const nextProjects = [...(prev.projects || [])];
+                                                            if (nextProjects[targetIdx]) {
+                                                               nextProjects[targetIdx] = { 
+                                                                  ...nextProjects[targetIdx], 
+                                                                  imageUrl: targetUrl 
+                                                               };
+                                                            }
+                                                            return { ...prev, projects: nextProjects };
+                                                         });
+                                                         lastUploadedUrlRef.current = null;
+                                                         pendingProjectIdxRef.current = null;
+                                                      }
+                                                   }}
+                                                >
+                                                   {({ open }) => (
+                                                      <button 
+                                                         onClick={() => open()}
+                                                         className="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white backdrop-blur-md transition-all border border-white/20 shadow-xl"
+                                                      >
+                                                         <PenTool className="w-4 h-4" />
+                                                      </button>
+                                              )}
+                                                </CldUploadWidget>
+                                             ) : (
+                                                <button 
+                                                   onClick={() => alert("Cloudinary is not configured. Please set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME in your environment.")}
+                                                   className="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white backdrop-blur-md transition-all border border-white/20 shadow-xl"
+                                                >
+                                                   <Upload className="w-4 h-4" />
+                                                </button>
+                                           )
                                              <button 
                                                 onClick={() => {
                                                    const next = [...(draftData.projects || [])];
@@ -771,49 +801,57 @@ export default function PortfolioManagement() {
                                           </div>
                                        </>
                                     ) : (
-                                       <CldUploadWidget
-                                          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"} 
-                                          options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme", cropping: false }}
-                                          onSuccess={(result: any) => {
-                                             const url = (result.info as any)?.secure_url || (result.info as any)?.url;
-                                             if (url) {
-                                                lastUploadedUrlRef.current = url;
-                                                pendingProjectIdxRef.current = idx;
-                                             }
-                                          }}
-                                          onClose={() => {
-                                             if (lastUploadedUrlRef.current && pendingProjectIdxRef.current !== null) {
-                                                const targetIdx = pendingProjectIdxRef.current;
-                                                const targetUrl = lastUploadedUrlRef.current;
-                                                setDraftData(prev => {
-                                                   if (!prev) return null;
-                                                   const nextProjects = [...(prev.projects || [])];
-                                                   if (nextProjects[targetIdx]) {
-                                                      nextProjects[targetIdx] = { 
-                                                         ...nextProjects[targetIdx], 
-                                                         imageUrl: targetUrl 
-                                                      };
-                                                   }
-                                                   return { ...prev, projects: nextProjects };
-                                                });
-                                                lastUploadedUrlRef.current = null;
-                                                pendingProjectIdxRef.current = null;
-                                             }
-                                          }}
-                                       >
-                                          {({ open }) => (
-                                             <button
-                                                onClick={() => open()}
-                                                className="w-full h-full flex flex-col items-center justify-center gap-2 text-text-muted hover:text-emerald-500 transition-colors group/btn"
-                                             >
-                                                <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center border border-border group-hover/btn:scale-110 group-hover/btn:border-emerald-500/50 transition-all shadow-sm">
-                                                   <ImageIcon className="w-5 h-5" />
-                                                </div>
-                                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Add Project Showcase</span>
-                                             </button>
-                                          )}
-                                       </CldUploadWidget>
-                                    )}
+                                       isCloudinaryConfigured ? (
+                                          <CldUploadWidget
+                                             uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"} 
+                                             options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme", cropping: false }}
+                                             onSuccess={(result: any) => {
+                                                const url = (result.info as any)?.secure_url || (result.info as any)?.url;
+                                                if (url) {
+                                                   lastUploadedUrlRef.current = url;
+                                                   pendingProjectIdxRef.current = idx;
+                                                }
+                                             }}
+                                             onClose={() => {
+                                                if (lastUploadedUrlRef.current && pendingProjectIdxRef.current !== null) {
+                                                   const targetIdx = pendingProjectIdxRef.current;
+                                                   const targetUrl = lastUploadedUrlRef.current;
+                                                   setDraftData(prev => {
+                                                      if (!prev) return null;
+                                                      const nextProjects = [...(prev.projects || [])];
+                                                      if (nextProjects[targetIdx]) {
+                                                         nextProjects[targetIdx] = { 
+                                                            ...nextProjects[targetIdx], 
+                                                            imageUrl: targetUrl 
+                                                         };
+                                                      }
+                                                      return { ...prev, projects: nextProjects };
+                                                   });
+                                                   lastUploadedUrlRef.current = null;
+                                                   pendingProjectIdxRef.current = null;
+                                                }
+                                             }}
+                                             onError={(error: any) => console.error('Project Upload Error:', error)}
+                                          >
+                                             {({ open }) => (
+                                                <button
+                                                   onClick={() => open()}
+                                                   className="w-full h-full flex flex-col items-center justify-center gap-2 text-text-muted hover:text-emerald-500 transition-colors group/btn"
+                                                >
+                                                   <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center border border-border group-hover/btn:scale-110 group-hover/btn:border-emerald-500/50 transition-all shadow-sm">
+                                                      <ImageIcon className="w-5 h-5" />
+                                                   </div>
+                                                   <span className="text-[10px] font-black uppercase tracking-[0.2em]">Add Project Showcase</span>
+                                                </button>
+                                             )}
+                                          </CldUploadWidget>
+                                       ) : (
+                                          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-red-500/50">
+                                             <ImageIcon className="w-5 h-5" />
+                                             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Cloudinary Missing</span>
+                                          </div>
+                                       )
+                                     )}
                                     </div>
 
                                     <div className="flex items-start justify-between">
