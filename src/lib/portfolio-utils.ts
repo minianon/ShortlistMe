@@ -56,14 +56,20 @@ export interface PortfolioData {
 }
 
 export const PRESET_THEMES = [
-  { id: "emerald", name: "Corporate Emerald", hex: "#10b981", primary: "emerald", mode: 'light' as const, gradient: "from-emerald-400 to-teal-600" },
-  { id: "midnight", name: "Executive Indigo", hex: "#6366f1", primary: "indigo", mode: 'dark' as const, gradient: "from-indigo-500 to-blue-700" },
+  { id: "emerald", name: "Corporate Emerald", hex: "#10b981", primary: "emerald", mode: 'light' as const, gradient: "from-emerald-400 to-teal-600", badge: "Classic" },
+  { id: "midnight", name: "Executive Indigo", hex: "#6366f1", primary: "indigo", mode: 'dark' as const, gradient: "from-indigo-500 to-blue-700", badge: "Trending" },
+  { id: "cyber", name: "Cyberpunk Neo", hex: "#d946ef", primary: "fuchsia", mode: 'dark' as const, gradient: "from-fuchsia-500 to-purple-800", badge: "New" },
+  { id: "nordic", name: "Nordic Frost", hex: "#94a3b8", primary: "slate", mode: 'light' as const, gradient: "from-slate-300 to-slate-500", badge: "Minimal" },
   { id: "royal", name: "Majestic Purple", hex: "#8b5cf6", primary: "violet", mode: 'dark' as const, gradient: "from-violet-500 to-purple-800" },
   { id: "rose", name: "Artistic Crimson", hex: "#f43f5e", primary: "rose", mode: 'light' as const, gradient: "from-rose-400 to-pink-600" },
   { id: "amber", name: "Sunset Horizon", hex: "#f59e0b", primary: "amber", mode: 'light' as const, gradient: "from-amber-400 to-orange-600" },
-  { id: "slate", name: "Graphite Professional", hex: "#64748b", primary: "slate", mode: 'dark' as const, gradient: "from-slate-500 to-zinc-700" },
+  { id: "gold", name: "Luxury Gold", hex: "#eab308", primary: "yellow", mode: 'dark' as const, gradient: "from-yellow-400 to-orange-700", badge: "Premium" },
   { id: "ocean", name: "Oceanic Depth", hex: "#0d9488", primary: "teal", mode: 'dark' as const, gradient: "from-teal-500 to-cyan-800" },
-  { id: "autumn", name: "Modern Tera", hex: "#c2410c", primary: "orange", mode: 'light' as const, gradient: "from-orange-500 to-amber-800" },
+  { id: "autumn", name: "Autumn Earth", hex: "#c2410c", primary: "orange", mode: 'light' as const, gradient: "from-orange-500 to-amber-800" },
+  { id: "mint", name: "Spring Mint", hex: "#10b981", primary: "emerald", mode: 'light' as const, gradient: "from-emerald-300 to-teal-500", badge: "New" },
+  { id: "volcano", name: "Volcanic Ash", hex: "#ef4444", primary: "red", mode: 'dark' as const, gradient: "from-red-500 to-orange-800" },
+  { id: "lavender", name: "Soft Lavender", hex: "#a855f7", primary: "purple", mode: 'light' as const, gradient: "from-purple-300 to-indigo-400", badge: "Pastel" },
+  { id: "slate", name: "Graphite Studio", hex: "#475569", primary: "slate", mode: 'dark' as const, gradient: "from-slate-600 to-zinc-900" },
 ];
 
 export const PRO_COLOR_SWATCHES = [

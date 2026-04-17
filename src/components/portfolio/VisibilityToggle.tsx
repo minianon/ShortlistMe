@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Globe, Loader2, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ToastContext";
 
 export default function VisibilityToggle({ 
   username, 
@@ -16,6 +17,7 @@ export default function VisibilityToggle({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const { showToast } = useToast();
 
   const handleMakePublic = async () => {
     setLoading(true);
@@ -29,13 +31,15 @@ export default function VisibilityToggle({
       if (!res.ok) throw new Error("Failed to update");
       
       setSuccess(true);
+      showToast("Your portfolio is now public and live!", "success");
+      
       // Wait a moment so the user sees the success state before refreshing
       setTimeout(() => {
         router.refresh();
-      }, 1000);
+      }, 1500);
     } catch (e) {
       console.error(e);
-      alert("Failed to make portfolio public");
+      showToast("Failed to update visibility. Please try again.", "error");
       setLoading(false);
     }
   };

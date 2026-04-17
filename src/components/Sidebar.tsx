@@ -16,10 +16,10 @@ import {
 } from "lucide-react";
 
 const NAV = [
-  { href: "/dashboard",           Icon: LayoutGrid, label: "Dashboard"  },
-  { href: "/dashboard/portfolio", Icon: Briefcase,  label: "Portfolio"  },
-  { href: "/dashboard/analytics", Icon: BarChart2,  label: "Analytics"  },
-  { href: "/dashboard/settings",  Icon: Settings,   label: "Settings"   },
+  { href: "/dashboard",           Icon: LayoutGrid, label: "Overview"  },
+  { href: "/dashboard/portfolio", Icon: Briefcase,  label: "Portfolio Studio"  },
+  { href: "/dashboard/analytics", Icon: BarChart2,  label: "Insights"    },
+  { href: "/dashboard/settings",  Icon: Settings,   label: "Settings"    },
 ];
 
 export default function Sidebar() {
