@@ -12,22 +12,22 @@ graph TD
     Store[(PostgreSQL - Prisma)]
     Bucket[(Supabase Storage)]
     
-    subgraph "Frontend (Next.js App Router)"
+    subgraph Frontend ["Frontend (Next.js App Router)"]
         Dashboard[User Dashboard]
         Editor[Portfolio Editor]
         PublicView[Public Portfolio Renderer]
     end
 
-    subgraph "API Layer (Serverless)"
-        Auth[Clerk Auth]
-        UploadAPI[/api/resume/upload]
-        GenAPI[/api/portfolio/generate]
-        PublicAPI[/api/portfolio/publish]
+    subgraph API ["API Layer (Serverless)"]
+        Auth["Clerk Auth"]
+        UploadAPI["/api/resume/upload"]
+        GenAPI["/api/portfolio/generate"]
+        PublicAPI["/api/portfolio/publish"]
     end
 
-    subgraph "AI & Processing"
-        Parser[PDF.js Text & Link Extractor]
-        Groq[Groq AI - LLM Extraction]
+    subgraph AI ["AI & Processing"]
+        Parser["PDF.js Text & Link Extractor"]
+        Groq["Groq AI - LLM Extraction"]
     end
 
     User --> Auth

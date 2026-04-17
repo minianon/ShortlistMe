@@ -18,7 +18,6 @@
 
 ---
 
-## ShortlistMe in Plain English
 **Imagine having a personal website that builds itself.**
 
 Most people find it hard to create a professional portfolio. You have to worry about design, hosting, and writing the same information over and over again.
