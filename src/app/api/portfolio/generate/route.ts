@@ -4,7 +4,51 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 import { supabaseAdmin } from "@/server/supabase";
 import Groq from "groq-sdk";
-import pdfParse from "pdf-parse";
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
+
+// Extract text and hyperlinks from a PDF buffer
+async function extractTextAndLinksFromPDF(buffer: Buffer): Promise<string> {
+  const loadingTask = pdfjs.getDocument({
+    data: new Uint8Array(buffer),
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    useSystemFonts: true
+  });
+  
+  const pdf = await loadingTask.promise;
+  let fullText = "";
+  const foundLinks = new Set<string>();
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    
+    // 1. Extract Text
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      .map((item: any) => item.str)
+      .join(" ");
+    fullText += pageText + "\n";
+
+    // 2. Extract Annotations (Links)
+    const annotations = await page.getAnnotations();
+    annotations.forEach((ann: any) => {
+      if (ann.subtype === 'Link' && ann.url) {
+        foundLinks.add(ann.url);
+      }
+    });
+  }
+
+  // Append found links as a reference for the AI
+  if (foundLinks.size > 0) {
+    fullText += "\n\n--- DETECTED HYPERLINKS IN DOCUMENT ---\n";
+    foundLinks.forEach(link => {
+      fullText += `- ${link}\n`;
+    });
+    fullText += "\nNote: Some of the URLs above might correspond to text labels like 'LinkedIn', 'Portfolio', or 'GitHub'. Match them logically.";
+  }
+
+  return fullText;
+}
 
 // Slugify a name into a URL-safe identifier
 function slugify(text: string): string {
@@ -58,8 +102,7 @@ export async function POST() {
       const buffer = Buffer.from(arrayBuffer);
 
       if (resume.mimeType === "application/pdf" || resume.originalFilename?.endsWith(".pdf")) {
-        const data = await pdfParse(buffer);
-        resumeText = data.text;
+        resumeText = await extractTextAndLinksFromPDF(buffer);
       } else {
         // For DOCX/DOC — extract raw text (good enough for LLM parsing)
         resumeText = buffer.toString("utf-8").replace(/[^\x20-\x7E\n\r\t]/g, " ").trim();
