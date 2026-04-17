@@ -21,6 +21,7 @@ import {
   Trash2,
   AlertTriangle
 } from "lucide-react";
+import { useToast } from "@/components/ToastContext";
 
 type Tab = "Profile" | "General" | "Notifications" | "Advanced";
 
@@ -39,6 +40,7 @@ export default function SettingsPage() {
 function SettingsContent() {
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
+  const { showToast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -100,21 +102,16 @@ function SettingsContent() {
     }
   }, [isLoaded, user]);
 
-  useEffect(() => {
-    fetch("/api/portfolio/status")
-      .then((r) => r.json())
-      .then((d) => {
-        setPortfolioSlug(d.portfolio?.slug ?? null);
-        setInitialSlug(d.portfolio?.slug ?? null);
-        if (d.portfolio?.isPublic !== undefined) setPublicVisibility(d.portfolio.isPublic);
+  const fetchPortfolio = async () => {
+    const r = await fetch("/api/portfolio/status");
+    const d = await r.json();
+    setPortfolioSlug(d.portfolio?.slug ?? null);
+    setInitialSlug(d.portfolio?.slug ?? null);
+    if (d.portfolio?.isPublic !== undefined) setPublicVisibility(d.portfolio.isPublic);
+  };
 
-        // Auto-fill from claim param if it exists
-        const claimParam = searchParams.get("claim");
-        if (claimParam && d.portfolio?.slug !== claimParam) {
-          setPortfolioSlug(claimParam);
-        }
-      })
-      .finally(() => setSlugLoading(false));
+  useEffect(() => {
+    fetchPortfolio().finally(() => setSlugLoading(false));
   }, [searchParams]);
 
   useEffect(() => {
@@ -208,9 +205,11 @@ function SettingsContent() {
     try {
       const res = await fetch("/api/portfolio/reset", { method: "POST" });
       if (!res.ok) throw new Error("Reset failed");
-      window.location.reload();
+      await fetchPortfolio();
+      showToast("Portfolio reset successfully.", "success");
     } catch (e) {
-      alert("Failed to reset portfolio");
+      console.error(e);
+      showToast("Failed to reset portfolio.", "error");
     } finally {
       setResetting(false);
       setConfirmReset(false);
@@ -222,10 +221,12 @@ function SettingsContent() {
     try {
       const res = await fetch("/api/user/delete", { method: "DELETE" });
       if (!res.ok) throw new Error("Deletion failed");
+      showToast("Account deleted successfully.", "success");
       await signOut();
       router.push("/");
     } catch (e) {
-      alert("Failed to delete account");
+      console.error(e);
+      showToast("Failed to delete account.", "error");
     } finally {
       setDeleting(false);
       setConfirmDelete(false);
@@ -264,7 +265,7 @@ function SettingsContent() {
               <button
                 key={id}
                 onClick={() => setTab(id as Tab)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left group whitespace-nowrap lg:whitespace-normal ${isActive ? "bg-emerald-500/10 text-emerald-500 shadow-sm border border-emerald-500/10" : "text-text-secondary hover:bg-background-tertiary hover:text-text"}`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-left group whitespace-nowrap lg:whitespace-normal outline-none border ${isActive ? "bg-emerald-500/10 text-emerald-500 shadow-sm border-emerald-500/20" : "border-transparent text-text-secondary hover:bg-background-tertiary hover:text-text"}`}
               >
                 <div className={`p-2 rounded-lg transition-colors ${isActive ? "bg-emerald-500 text-white" : "bg-background-tertiary text-text-muted group-hover:text-text"}`}>
                   <Icon className="w-4 h-4" />
@@ -339,7 +340,35 @@ function SettingsContent() {
                         <Globe className="w-4 h-4 text-text-muted" />
                         <span className="ml-2.5 text-xs font-bold text-text-secondary">{appUrl}</span>
                       </div>
-                      <input type="text" value={slugLoading ? "Loading..." : (portfolioSlug ?? "")} disabled={slugLoading} onChange={(e) => setPortfolioSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} className="flex-1 bg-transparent px-5 py-4 text-sm font-black text-text outline-none placeholder:font-normal" placeholder="your-name" />
+                      <input 
+                        type="text" 
+                        value={slugLoading ? "Loading..." : (portfolioSlug ?? "")} 
+                        disabled={slugLoading} 
+                        onChange={(e) => setPortfolioSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} 
+                        className="flex-1 bg-transparent px-5 py-4 text-sm font-black text-text outline-none placeholder:font-normal" 
+                        placeholder="your-name" 
+                      />
+                      <div className="flex items-center pr-4 bg-background">
+                        {checkingSlug && (
+                          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/5 rounded-full animate-pulse border border-emerald-500/10">
+                            <Loader2 className="w-3 h-3 animate-spin text-emerald-500" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">Checking</span>
+                          </div>
+                        )}
+                        {!checkingSlug && portfolioSlug !== initialSlug && portfolioSlug && (
+                          slugAvailable ? (
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                              <Check className="w-3 h-3 text-emerald-500" />
+                              <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">Available</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 rounded-full border border-red-500/20">
+                              <X className="w-3 h-3 text-red-500" />
+                              <span className="text-[9px] font-black uppercase tracking-widest text-red-500">Taken</span>
+                            </div>
+                          )
+                        )}
+                      </div>
                     </div>
                     {slugError && <p className="text-[10px] font-bold text-red-500 mt-2 ml-1">⚠️ {slugError}</p>}
                   </div>
@@ -358,17 +387,14 @@ function SettingsContent() {
                 </div>
 
                 <div className="flex items-center gap-4 border-t border-border pt-8 mt-8">
-                  {portfolioSlug !== initialSlug && (
-                    <button onClick={handleSaveSlug} disabled={savingSlug || !slugAvailable} className="h-12 px-8 bg-text text-background hover:bg-text-secondary rounded-xl text-sm font-black transition-all shadow-lg active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">
-                      {savingSlug && <Loader2 className="w-4 h-4 animate-spin" />}
-                      Update Handle
-                    </button>
-                  )}
-                  <div className="flex items-center h-10">
-                    {checkingSlug && <div className="flex items-center gap-3 px-4 py-2 bg-background-secondary border border-border rounded-lg animate-pulse"><Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-500" /><span className="text-[10px] font-black uppercase tracking-[0.15em] text-text-secondary">Scanning availability...</span></div>}
-                    {!checkingSlug && portfolioSlug !== initialSlug && slugAvailable === false && <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/5 border border-red-500/20 rounded-lg"><X className="w-3.5 h-3.5 text-red-500" /><span className="text-[10px] font-black uppercase tracking-widest text-red-500">Handle unavailable</span></div>}
-                    {!checkingSlug && portfolioSlug !== initialSlug && slugAvailable === true && <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/5 border border-emerald-500/20 rounded-lg animate-fade-in"><Check className="w-3.5 h-3.5 text-emerald-500" /><span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Handle available</span></div>}
-                  </div>
+                  <button 
+                    onClick={handleSaveSlug} 
+                    disabled={savingSlug || portfolioSlug === initialSlug || !slugAvailable || !portfolioSlug} 
+                    className="h-12 px-8 bg-text text-background hover:bg-text-secondary rounded-xl text-sm font-black transition-all shadow-lg active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {savingSlug && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Update Handle
+                  </button>
                   {saveSlugStatus === "success" && <StatusMsg type="success" text="URL updated" />}
                 </div>
               </section>

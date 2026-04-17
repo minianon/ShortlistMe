@@ -29,6 +29,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { ToastProvider } from "@/components/ToastContext";
 
 export default function RootLayout({
   children,
@@ -47,7 +48,11 @@ export default function RootLayout({
         }
       >
         <body className="min-h-full flex flex-col antialiased">
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

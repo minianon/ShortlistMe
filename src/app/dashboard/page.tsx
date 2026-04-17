@@ -59,6 +59,46 @@ const STAGE_LABELS: Record<GenerateStage, string> = {
 
 // ── Main Component ─────────────────────────────────────
 
+function DashboardSkeleton() {
+  return (
+    <div className="flex flex-col gap-8 max-w-[1700px] mx-auto px-6 md:px-12 lg:px-16 xl:px-24 pb-12 animate-pulse">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div className="flex-1 space-y-3">
+          <div className="h-10 w-48 skeleton" />
+          <div className="h-4 w-96 skeleton" />
+        </div>
+        <div className="flex gap-3">
+          <div className="h-10 w-32 skeleton rounded-xl" />
+          <div className="h-10 w-32 skeleton rounded-xl" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="h-28 bg-background border border-border rounded-2xl p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl skeleton flex-shrink-0" />
+            <div className="space-y-2 flex-1">
+              <div className="h-6 w-16 skeleton" />
+              <div className="h-3 w-24 skeleton" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-5">
+          <div className="h-6 w-32 skeleton" />
+          <div className="h-52 w-full skeleton rounded-2xl" />
+        </div>
+        <div className="space-y-5">
+          <div className="h-6 w-32 skeleton" />
+          <div className="h-52 w-full bg-background border border-border rounded-2xl border-dashed skeleton" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardHome() {
   const { user } = useUser();
 
@@ -75,7 +115,10 @@ export default function DashboardHome() {
 
   // ── Fetch dashboard data ──
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    // Only show the skeleton loader if we have no data yet
+    const isInitial = resumes.length === 0 && !portfolio;
+    if (isInitial) setLoading(true);
+    
     try {
       const [resumeRes, portfolioRes] = await Promise.all([
         fetch("/api/resume/list"),
@@ -89,7 +132,7 @@ export default function DashboardHome() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [resumes.length, portfolio]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -164,6 +207,11 @@ export default function DashboardHome() {
   const versionCount = portfolio?._count.versions ?? 0;
   const portfolioSlug = generatedSlug ?? portfolio?.slug;
 
+  // Show skeleton only on the very first load when we have no data
+  if (loading && resumes.length === 0 && !portfolio) {
+    return <DashboardSkeleton />;
+  }
+
   return (
     <div className="flex flex-col gap-8 max-w-[1700px] mx-auto px-6 md:px-12 lg:px-16 xl:px-24 pb-12">
 
@@ -171,7 +219,7 @@ export default function DashboardHome() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 animate-fade-in">
         <div className="flex-1">
           <h1 className="text-4xl font-black text-text tracking-tight mb-2" style={{ fontFamily: "var(--font-display)" }}>
-            Dashboard<span className="text-emerald-500">.</span>
+            Overview<span className="text-emerald-500">.</span>
           </h1>
           <p className="text-text-secondary font-medium outline-none">
             {isPublished

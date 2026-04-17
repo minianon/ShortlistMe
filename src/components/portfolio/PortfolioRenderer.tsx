@@ -188,15 +188,15 @@ export default function PortfolioRenderer({
         <section className={`flex flex-col ${isMobilePreview ? '' : 'md:flex-row md:items-center'} gap-12`}>
           <div className="flex-1">
             <div 
-               className="inline-flex items-center gap-2 px-3 py-1.5 border rounded-full mb-6"
-               style={{ ...styles.borderPrimaryStyle, backgroundColor: `${styles.primaryHex}1a`, animation: "revealUp 0.6s cubic-bezier(0.16,1,0.3,1) 0s both" }}
+               className="inline-flex items-center gap-2 px-3 py-1.5 border rounded-full mb-6 animate-fade-up"
+               style={{ ...styles.borderPrimaryStyle, backgroundColor: `${styles.primaryHex}1a` }}
             >
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={styles.bgPrimaryStyle} />
               <span className="text-[10px] font-bold uppercase tracking-widest" style={styles.primaryStyle}>Available for work</span>
             </div>
             <h1 
-              className={`${isMobilePreview ? 'text-3xl' : 'text-4xl md:text-6xl'} font-black tracking-tight leading-[1.05] mb-6`} 
-              style={{ fontFamily: "var(--font-display)", animation: "revealUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}
+              className={`${isMobilePreview ? 'text-3xl' : 'text-4xl md:text-6xl'} font-black tracking-tight leading-[1.05] mb-6 animate-fade-up`} 
+              style={{ fontFamily: "var(--font-display)", animationDelay: "100ms" }}
             >
               {data.name}<span style={styles.primaryStyle}>{styles.isCustom ? "" : "."}</span>
             </h1>

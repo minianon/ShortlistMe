@@ -67,6 +67,38 @@ interface AnalyticsData {
   }[];
 }
 
+function AnalyticsSkeleton() {
+  return (
+    <div className="flex flex-col gap-8 max-w-[1700px] mx-auto px-6 md:px-12 lg:px-16 xl:px-24 pb-12 animate-pulse">
+      <div className="space-y-3">
+        <div className="h-10 w-48 skeleton" />
+        <div className="h-4 w-96 skeleton" />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-background rounded-3xl p-6 border border-border">
+            <div className="w-10 h-10 rounded-xl skeleton mb-4" />
+            <div className="h-3 w-20 skeleton mb-2" />
+            <div className="h-8 w-32 skeleton" />
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-background rounded-[2rem] p-8 border border-border h-[450px]">
+        <div className="flex justify-between mb-10">
+          <div className="space-y-2">
+            <div className="h-6 w-40 skeleton" />
+            <div className="h-3 w-64 skeleton" />
+          </div>
+          <div className="h-10 w-32 skeleton rounded-xl" />
+        </div>
+        <div className="h-[300px] w-full skeleton rounded-2xl" />
+      </div>
+    </div>
+  );
+}
+
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,7 +108,9 @@ export default function AnalyticsPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        setLoading(true);
+        // Only show skeleton on first load
+        if (!data) setLoading(true);
+        
         const res = await fetch(`/api/analytics/stats?days=${days}`);
         if (!res.ok) throw new Error("Failed to fetch analytics");
         const json = await res.json();
@@ -88,7 +122,7 @@ export default function AnalyticsPage() {
       }
     }
     fetchStats();
-  }, [days]);
+  }, [days]); // removed data dependency to avoid infinite loops, we only want to trigger on 'days' change
 
   const fallbackData: AnalyticsData = {
     metrics: { 
@@ -144,13 +178,9 @@ export default function AnalyticsPage() {
     },
   ], [displayData]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <Loader2 className="w-10 h-10 text-emerald-500 animate-spin" />
-        <p className="text-sm font-bold text-text-secondary">Loading your insights...</p>
-      </div>
-    );
+  // Use professional skeleton on initial load
+  if (loading && !data) {
+    return <AnalyticsSkeleton />;
   }
 
 
@@ -158,11 +188,19 @@ export default function AnalyticsPage() {
     <div className="flex flex-col gap-8 max-w-[1700px] mx-auto px-6 md:px-12 lg:px-16 xl:px-24 pb-12">
       
       {/* ── Page Header ── */}
-      <div className="animate-fade-in">
-        <h1 className="text-4xl font-black text-text tracking-tight mb-2" style={{ fontFamily: "var(--font-display)" }}>
-          Analytics<span className="text-emerald-500">.</span>
-        </h1>
-        <p className="text-text-secondary font-medium outline-none">Track your professional engine's performance and audience engagement.</p>
+      <div className="animate-fade-in flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-black text-text tracking-tight mb-2" style={{ fontFamily: "var(--font-display)" }}>
+            Insights<span className="text-emerald-500">.</span>
+          </h1>
+          <p className="text-text-secondary font-medium outline-none">Track your professional engine's performance and audience engagement.</p>
+        </div>
+        {loading && data && (
+          <div className="flex items-center gap-2 px-4 py-2 bg-background-secondary border border-border rounded-xl animate-fade-in">
+            <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" />
+            <span className="text-xs font-bold text-text-secondary">Updating data...</span>
+          </div>
+        )}
       </div>
 
       {/* ── Top Metric Cards ── */}
@@ -189,7 +227,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* ── Main Graph ── */}
-      <div className="bg-background rounded-[2rem] p-8 shadow-sm border border-border">
+      <div className={`bg-background rounded-[2rem] p-8 shadow-sm border border-border transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
             <div>
                <h2 className="text-xl font-black text-text mb-1" style={{ fontFamily: "var(--font-display)" }}>Visitor Trends</h2>
@@ -217,7 +255,20 @@ export default function AnalyticsPage() {
             </div>
          </div>
          
-         <div className="h-[300px] w-full mt-4">
+         <div className="h-[300px] w-full mt-4 relative">
+           {/* Range change skeleton overlay */}
+           {loading && data && (
+             <div className="absolute inset-0 z-10 bg-background/40 backdrop-blur-[2px] rounded-2xl overflow-hidden">
+               <div className="w-full h-full skeleton opacity-50" />
+               <div className="absolute inset-0 flex items-center justify-center">
+                 <div className="flex items-center gap-2 px-3 py-1.5 bg-background border border-border rounded-lg shadow-xl shadow-black/10">
+                   <Loader2 className="w-3.5 h-3.5 text-emerald-500 animate-spin" />
+                   <span className="text-[10px] font-black uppercase tracking-widest text-text-secondary">Refreshing Trend</span>
+                 </div>
+               </div>
+             </div>
+           )}
+
            {data?.chartData && data.chartData.length > 0 ? (
              <ResponsiveContainer width="100%" height="100%">
                <AreaChart data={data.chartData}>
