@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import Link from "next/link";
 import { 
   MapPin, 
   Mail, 
@@ -31,6 +32,57 @@ interface PortfolioRendererProps {
   portfolioId?: string; // Only provided on the live public page
   visitId?: string; // Provided when tracking a visit
 }
+
+// ── Custom Brand Icons to avoid versioning issues ──
+const LinkedInIcon = ({ className, style }: { className?: string, style?: any }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+    style={style}
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+    <rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/>
+  </svg>
+);
+
+const GitHubIcon = ({ className, style }: { className?: string, style?: any }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="24" 
+    height="24" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+    style={style}
+  >
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>
+  </svg>
+);
+
+const XIcon = ({ className, style }: { className?: string, style?: any }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    width="24" 
+    height="24"
+    fill="currentColor" 
+    className={className}
+    style={style}
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+);
 
 export default function PortfolioRenderer({ 
   data, 
@@ -104,9 +156,13 @@ export default function PortfolioRenderer({
       {/* ── Navigation Header (Sandboxed) ── */}
       <header className="sticky top-0 z-50 backdrop-blur-md border-b" style={{ backgroundColor: `${styles.surface}e6`, borderColor: styles.border }}>
         <div className={`w-full ${isMobilePreview ? 'px-4' : 'max-w-6xl mx-auto px-6'} h-16 flex items-center justify-between`}>
-          <div style={{ fontFamily: "var(--font-display)" }} className="text-lg font-extrabold tracking-tight">
+          <Link
+            href="/"
+            style={{ fontFamily: "var(--font-display)" }}
+            className="text-lg font-extrabold tracking-tight hover:opacity-80 transition-opacity"
+          >
             Shortlist<span style={styles.primaryStyle}>Me</span>
-          </div>
+          </Link>
           <nav className={`${isMobilePreview ? 'hidden' : 'hidden md:flex'} items-center gap-6 text-sm font-semibold`} style={{ color: styles.textSecondary }}>
             {visibility.experience && (data.experience || []).length > 0 && <a href="#experience" className="hover:opacity-80 transition-opacity">Experience</a>}
             {visibility.skills && (data.skills || []).length > 0 && <a href="#skills" className="hover:opacity-80 transition-opacity">Skills</a>}
@@ -117,7 +173,7 @@ export default function PortfolioRenderer({
             <a
               href={`mailto:${data.email}`}
               onClick={() => trackClick("email_header", `mailto:${data.email}`)}
-              className="px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-lg"
+              className="px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-lg hover:scale-105 active:scale-95"
               style={{ ...styles.bgPrimaryStyle, color: styles.accentText, boxShadow: `0 4px 6px -1px ${styles.primaryHex}33` }}
             >
               Get in Touch
@@ -133,19 +189,22 @@ export default function PortfolioRenderer({
           <div className="flex-1">
             <div 
                className="inline-flex items-center gap-2 px-3 py-1.5 border rounded-full mb-6"
-               style={{ ...styles.borderPrimaryStyle, backgroundColor: `${styles.primaryHex}1a` }}
+               style={{ ...styles.borderPrimaryStyle, backgroundColor: `${styles.primaryHex}1a`, animation: "revealUp 0.6s cubic-bezier(0.16,1,0.3,1) 0s both" }}
             >
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={styles.bgPrimaryStyle} />
               <span className="text-[10px] font-bold uppercase tracking-widest" style={styles.primaryStyle}>Available for work</span>
             </div>
-            <h1 className={`${isMobilePreview ? 'text-3xl' : 'text-4xl md:text-6xl'} font-black tracking-tight leading-[1.05] mb-6`} style={{ fontFamily: "var(--font-display)" }}>
+            <h1 
+              className={`${isMobilePreview ? 'text-3xl' : 'text-4xl md:text-6xl'} font-black tracking-tight leading-[1.05] mb-6`} 
+              style={{ fontFamily: "var(--font-display)", animation: "revealUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s both" }}
+            >
               {data.name}<span style={styles.primaryStyle}>{styles.isCustom ? "" : "."}</span>
             </h1>
-            <p className="text-lg mb-6 font-semibold" style={{ color: styles.textSecondary }}>{data.title}</p>
-            {data.bio && <p className="text-sm md:text-base leading-relaxed max-w-xl mb-8 whitespace-pre-wrap" style={{ color: styles.textSecondary }}>{data.bio}</p>}
+            <p className="text-lg mb-6 font-semibold" style={{ color: styles.textSecondary, animation: "revealUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}>{data.title}</p>
+            {data.bio && <p className="text-sm md:text-base leading-relaxed max-w-xl mb-8 whitespace-pre-wrap" style={{ color: styles.textSecondary, animation: "revealUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>{data.bio}</p>}
 
             {/* Contact Grid */}
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4" style={{ animation: "revealUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.4s both" }}>
               {data.location && (
                 <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: styles.textSecondary }}>
                   <MapPin className="w-4 h-4" style={styles.primaryStyle} />
@@ -153,13 +212,57 @@ export default function PortfolioRenderer({
                 </div>
               )}
               {data.email && (
-                <div className="flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: styles.textSecondary }}>
-                  <Mail className="w-4 h-4" style={styles.primaryStyle} />
+                <a 
+                  href={`mailto:${data.email}`}
+                  onClick={() => trackClick("email_hero", `mailto:${data.email}`)}
+                  className="flex items-center gap-2 text-sm font-semibold transition-all hover:opacity-70 group" 
+                  style={{ color: styles.textSecondary }}
+                >
+                  <Mail className="w-4 h-4 group-hover:scale-110 transition-transform" style={styles.primaryStyle} />
                   {data.email}
-                </div>
+                </a>
+              )}
+              {data.linkedin && (
+                <a 
+                  href={data.linkedin.startsWith('http') ? data.linkedin : `https://${data.linkedin}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackClick("linkedin_hero", data.linkedin)}
+                  className="flex items-center gap-2 text-sm font-semibold transition-all hover:opacity-70 group" 
+                  style={{ color: styles.textSecondary }}
+                >
+                  <LinkedInIcon className="w-4 h-4 group-hover:scale-110 transition-transform" style={{ color: styles.primaryHex }} />
+                  LinkedIn
+                </a>
+              )}
+              {data.github && (
+                <a 
+                  href={data.github.startsWith('http') ? data.github : `https://${data.github}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackClick("github_hero", data.github)}
+                  className="flex items-center gap-2 text-sm font-semibold transition-all hover:opacity-70 group" 
+                  style={{ color: styles.textSecondary }}
+                >
+                  <GitHubIcon className="w-4 h-4 group-hover:scale-110 transition-transform" style={{ color: styles.primaryHex }} />
+                  GitHub
+                </a>
+              )}
+              {data.twitter && (
+                <a 
+                  href={data.twitter.startsWith('http') ? data.twitter : `https://${data.twitter}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackClick("twitter_hero", data.twitter)}
+                  className="flex items-center gap-2 text-sm font-semibold transition-all hover:opacity-70 group" 
+                  style={{ color: styles.textSecondary }}
+                >
+                  <XIcon className="w-4 h-4 group-hover:scale-110 transition-transform" style={{ color: styles.primaryHex }} />
+                  X
+                </a>
               )}
               {data.phone && (
-                <div className="flex items-center gap-2 text-sm font-semibold transition-colors" style={{ color: styles.textSecondary }}>
+                <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: styles.textSecondary }}>
                    <Phone className="w-4 h-4" style={styles.primaryStyle} />
                    {data.phone}
                 </div>
@@ -171,7 +274,7 @@ export default function PortfolioRenderer({
           {data.photoUrl ? (
             <div 
               className={`${isMobilePreview ? 'w-40 h-40' : 'w-48 h-48 md:w-64 md:h-64'} rounded-full overflow-hidden flex-shrink-0 mx-auto ${isMobilePreview ? '' : 'md:mx-0'} border-4 border-white dark:border-zinc-800`}
-              style={styles.shadowStyle}
+              style={{ ...styles.shadowStyle, animation: "revealUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}
             >
                <img src={data.photoUrl} alt={data.name} className="w-full h-full object-cover" />
             </div>
@@ -180,7 +283,7 @@ export default function PortfolioRenderer({
 
         {/* ── Experience ── */}
         {visibility.experience && (data.experience || []).length > 0 && (
-          <section id="experience" className="animate-fade-in">
+          <section id="experience" style={{ animation: "revealUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
             <h2 className="text-2xl font-black mb-10" style={{ fontFamily: "var(--font-display)" }}>
               Work Experience
             </h2>
@@ -188,8 +291,8 @@ export default function PortfolioRenderer({
               {(data.experience || []).map((exp, i) => (
                 <div 
                   key={i} 
-                  className={`border rounded-2xl ${isMobilePreview ? 'p-6' : 'p-8'} transition-all hover:shadow-sm`} 
-                  style={{ backgroundColor: styles.surfaceSecondary, borderColor: styles.border }}
+                  className={`portfolio-card border rounded-2xl ${isMobilePreview ? 'p-6' : 'p-8'}`} 
+                  style={{ backgroundColor: styles.surfaceSecondary, borderColor: styles.border, animation: `revealUp 0.5s cubic-bezier(0.16,1,0.3,1) ${0.35 + i * 0.08}s both` }}
                 >
                   <div className={`flex flex-col ${isMobilePreview ? '' : 'sm:flex-row sm:items-start sm:justify-between'} gap-2 mb-3`}>
                     <div>
@@ -212,13 +315,13 @@ export default function PortfolioRenderer({
 
         {/* ── Skills ── */}
         {visibility.skills && (data.skills || []).length > 0 && (
-          <section id="skills" className="animate-fade-in">
+          <section id="skills" style={{ animation: "revealUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.4s both" }}>
             <h2 className="text-2xl font-black mb-10" style={{ fontFamily: "var(--font-display)" }}>Skills</h2>
             <div className="flex flex-wrap gap-3">
               {(data.skills || []).filter(s => s.trim() !== "").map((skill, i) => (
                 <span 
                   key={i} 
-                  className="px-3 py-1.5 border rounded-xl text-xs font-semibold transition-all hover:opacity-80"
+                  className="skill-tag px-3 py-1.5 border rounded-xl text-xs font-semibold"
                   style={{ backgroundColor: styles.surfaceSecondary, borderColor: styles.border }}
                 >
                   {skill}
@@ -230,14 +333,14 @@ export default function PortfolioRenderer({
 
         {/* ── Projects ── */}
         {visibility.projects && (data.projects || []).length > 0 && (
-          <section id="projects" className="animate-fade-in">
+          <section id="projects" style={{ animation: "revealUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.35s both" }}>
             <h2 className="text-2xl font-black mb-10" style={{ fontFamily: "var(--font-display)" }}>Projects</h2>
             <div className={`grid grid-cols-1 ${isMobilePreview ? '' : 'md:grid-cols-2'} gap-6`}>
               {(data.projects || []).map((proj, i) => (
                  <div 
                    key={i} 
-                   className="border rounded-2xl overflow-hidden transition-all hover:shadow-sm group group-hover:border-emerald-500/30 flex flex-col" 
-                   style={{ backgroundColor: styles.surfaceSecondary, borderColor: styles.border }}
+                   className={`portfolio-card border rounded-2xl overflow-hidden group flex flex-col`} 
+                   style={{ backgroundColor: styles.surfaceSecondary, borderColor: styles.border, animation: `revealUp 0.5s cubic-bezier(0.16,1,0.3,1) ${0.4 + i * 0.1}s both` }}
                  >
                    {proj.imageUrl && (
                      <div className="aspect-video w-full overflow-hidden border-b" style={{ borderColor: styles.border }}>
@@ -284,14 +387,14 @@ export default function PortfolioRenderer({
 
         {/* ── Education ── */}
         {visibility.education && (data.education || []).length > 0 && (
-          <section id="education" className="animate-fade-in">
+          <section id="education" style={{ animation: "revealUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.4s both" }}>
             <h2 className="text-2xl font-black mb-10" style={{ fontFamily: "var(--font-display)" }}>Education</h2>
             <div className="flex flex-col gap-4">
               {(data.education || []).map((edu, i) => (
                 <div 
                   key={i} 
-                  className="border rounded-2xl p-6 flex items-start justify-between gap-4" 
-                  style={{ backgroundColor: styles.surfaceSecondary, borderColor: styles.border }}
+                  className={`portfolio-card border rounded-2xl p-6 flex items-start justify-between gap-4`} 
+                  style={{ backgroundColor: styles.surfaceSecondary, borderColor: styles.border, animation: `revealUp 0.5s cubic-bezier(0.16,1,0.3,1) ${0.45 + i * 0.08}s both` }}
                 >
                   <div>
                     <h3 className="text-base font-black">{edu.degree}</h3>
@@ -314,7 +417,7 @@ export default function PortfolioRenderer({
         {data.email && (
           <section 
             className="rounded-3xl p-12 md:p-20 text-center relative overflow-hidden shadow-xl"
-            style={{ ...styles.bgPrimaryStyle, ...styles.shadowStyle, color: styles.accentText }}
+            style={{ ...styles.bgPrimaryStyle, ...styles.shadowStyle, color: styles.accentText, animation: "revealUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.5s both" }}
           >
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
             <div className="relative z-10">

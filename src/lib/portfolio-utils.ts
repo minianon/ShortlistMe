@@ -38,6 +38,7 @@ export interface PortfolioData {
   linkedin?: string;
   github?: string;
   website?: string;
+  twitter?: string;
   photoUrl?: string | null;
   skills: string[];
   experience: Experience[];

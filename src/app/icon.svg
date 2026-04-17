@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .m { fill: #f7f6f3; }
+    }
+  </style>
+  <text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" style="font-family: 'Manrope', -apple-system, system-ui, sans-serif; font-weight: 800; font-size: 21px; letter-spacing: -1.5px;">
+    <tspan fill="#10b981">S</tspan><tspan fill="#111110" class="m">M</tspan>
+  </text>
+</svg>
