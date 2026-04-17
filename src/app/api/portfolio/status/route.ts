@@ -40,6 +40,11 @@ export async function GET() {
       slug: true,
       publishedVersionId: true,
       publishedVersion: { select: { data: true } },
+      versions: { 
+        select: { data: true },
+        orderBy: { createdAt: "desc" },
+        take: 1
+      },
       isPublic: true,
       createdAt: true,
       updatedAt: true,
@@ -86,6 +91,11 @@ export async function GET() {
         slug: true,
         publishedVersionId: true,
         publishedVersion: { select: { data: true } },
+        versions: { 
+          select: { data: true },
+          orderBy: { createdAt: "desc" },
+          take: 1
+        },
         isPublic: true,
         createdAt: true,
         updatedAt: true,

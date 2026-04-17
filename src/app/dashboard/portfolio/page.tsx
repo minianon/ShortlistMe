@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
    Undo2,
    PenTool,
@@ -36,7 +37,8 @@ import {
    Package,
    Link2,
    Lock,
-   Settings2
+   Settings2,
+   Phone
 } from "lucide-react";
 import { CldUploadButton, CldUploadWidget } from 'next-cloudinary';
 import { motion, AnimatePresence } from "framer-motion";
@@ -169,7 +171,8 @@ function PortfolioSkeleton() {
    );
 }
 
-export default function PortfolioManagement() {
+function PortfolioManagementContent() {
+   const searchParams = useSearchParams();
    const [state, setState] = useState<PreviewState | null>(null);
    const [draftData, setDraftData] = useState<PortfolioData | null>(null);
 
@@ -180,6 +183,14 @@ export default function PortfolioManagement() {
    const [togglingPublic, setTogglingPublic] = useState(false);
    const [isEditing, setIsEditing] = useState(false);
    const [device, setDevice] = useState<"laptop" | "mobile">("laptop");
+
+   // Check for edit query param
+   useEffect(() => {
+      const editMode = searchParams.get("edit");
+      if (editMode === "true") {
+         setIsEditing(true);
+      }
+   }, [searchParams]);
 
    // Inspector UI State
    const [expandedSections, setExpandedSections] = useState<string[]>(["identity"]);
@@ -661,6 +672,19 @@ export default function PortfolioManagement() {
                                              className="w-full bg-background border border-border py-3 pl-10 pr-3 rounded-2xl text-xs font-bold outline-none focus:border-emerald-500/50 transition-all shadow-sm"
                                           />
                                        </div>
+                                    </div>
+                                 </div>
+
+                                 <div className="group/field">
+                                    <label className="text-[9px] font-black text-text-muted uppercase tracking-[0.2em] ml-1 mb-1.5 block transition-colors group-focus-within/field:text-emerald-500">Phone Number</label>
+                                    <div className="relative">
+                                       <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted group-focus-within/field:text-emerald-500 transition-colors" />
+                                       <input
+                                          value={draftData.phone || ""}
+                                          onChange={(e) => setDraftData({ ...draftData, phone: e.target.value })}
+                                          className="w-full bg-background border border-border py-3 pl-10 pr-3 rounded-2xl text-xs font-bold outline-none focus:border-emerald-500/50 transition-all shadow-sm"
+                                          placeholder="+1 (555) 000-0000"
+                                       />
                                     </div>
                                  </div>
 
@@ -1255,5 +1279,13 @@ export default function PortfolioManagement() {
             </DashboardErrorBoundary>
          </div>
       </div>
+   );
+}
+
+export default function PortfolioManagement() {
+   return (
+      <Suspense fallback={<PortfolioSkeleton />}>
+         <PortfolioManagementContent />
+      </Suspense>
    );
 }

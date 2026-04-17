@@ -4,9 +4,59 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 import { supabaseAdmin } from "@/server/supabase";
 import Groq from "groq-sdk";
-import { PDFParse } from "pdf-parse";
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs"
+import path from "path";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Configure pdfjs worker
+const workerPath = path.resolve(process.cwd(), "node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs");
+const workerUrl = `file://${workerPath.replace(/\\/g, "/")}`;
+pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+
+// Extract text and hyperlinks from a PDF buffer
+async function extractTextAndLinksFromPDF(buffer: Buffer): Promise<string> {
+  const loadingTask = pdfjs.getDocument({
+    data: new Uint8Array(buffer),
+    useWorkerFetch: false,
+    isEvalSupported: false,
+    useSystemFonts: true
+  });
+  
+  const pdf = await loadingTask.promise;
+  let fullText = "";
+  const foundLinks = new Set<string>();
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    
+    // 1. Extract Text
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      .map((item: any) => item.str)
+      .join(" ");
+    fullText += pageText + "\n";
+
+    // 2. Extract Annotations (Links)
+    const annotations = await page.getAnnotations();
+    annotations.forEach((ann: any) => {
+      if (ann.subtype === 'Link' && ann.url) {
+        foundLinks.add(ann.url);
+      }
+    });
+  }
+
+  // Append found links as a reference for the AI
+  if (foundLinks.size > 0) {
+    fullText += "\n\n--- DETECTED HYPERLINKS IN DOCUMENT ---\n";
+    foundLinks.forEach(link => {
+      fullText += `- ${link}\n`;
+    });
+    fullText += "\nNote: Some of the URLs above might correspond to text labels like 'LinkedIn', 'Portfolio', or 'GitHub'. Match them logically.";
+  }
+
+  return fullText;
+}
 
 // Slugify a name into a URL-safe identifier
 function slugify(text: string): string {
@@ -23,7 +73,7 @@ export async function POST() {
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const clerkUser = await currentUser();
-
+  
   // 1. Find the user and their latest resume
   const dbUser = await prisma.user.findUnique({
     where: { clerkUserId: userId },
@@ -54,14 +104,13 @@ export async function POST() {
     const buffer = Buffer.from(arrayBuffer);
 
     if (resume.mimeType === "application/pdf" || resume.originalFilename?.endsWith(".pdf")) {
-      const pdfParser = new PDFParse({ data: buffer });
-      const parsed = await pdfParser.getText();
-      resumeText = parsed.text;
+      resumeText = await extractTextAndLinksFromPDF(buffer);
     } else {
       // For DOCX/DOC — extract raw text (good enough for LLM parsing)
       resumeText = buffer.toString("utf-8").replace(/[^\x20-\x7E\n\r\t]/g, " ").trim();
     }
-  } catch {
+  } catch (err) {
+    console.error("PDF Parsing Error:", err);
     return NextResponse.json({ error: "Failed to parse resume file." }, { status: 500 });
   }
 
@@ -70,7 +119,10 @@ export async function POST() {
   }
 
   // 4. Send to Groq for structured extraction
-  const prompt = `You are a professional resume parser. Extract the following information from the resume text below and return it as a valid JSON object. Do NOT include any markdown, code fences, or extra text — ONLY return the JSON object.
+  const prompt = `You are a professional resume parser. Extract the following information from the resume text below and return it as a valid JSON object. 
+IMPORTANT: Some URLs might be listed at the end of the text under 'DETECTED HYPERLINKS'. Use these to fill the linkedin, github, and website fields by matching them to the labels in the main text.
+
+Do NOT include any markdown, code fences, or extra text — ONLY return the JSON object.
 
 Extract these fields:
 {
@@ -80,9 +132,9 @@ Extract these fields:
   "location": "City, Country (if available)",
   "email": "Email address (if available)",
   "phone": "Phone number (if available)",
-  "linkedin": "LinkedIn URL (if available)",
-  "github": "GitHub URL (if available)",
-  "website": "Personal website URL (if available)",
+  "linkedin": "Full LinkedIn profile URL",
+  "github": "Full GitHub profile URL",
+  "website": "Personal portfolio or website URL",
   "skills": ["skill1", "skill2", ...],
   "experience": [
     {

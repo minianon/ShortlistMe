@@ -399,12 +399,42 @@ function SettingsContent() {
                 </div>
               </section>
 
-              <section className="bg-background/40 backdrop-blur-md border border-border rounded-[2rem] p-8 md:p-10 shadow-xl shadow-black/5 flex items-center justify-between">
+              <section className="relative bg-background/40 backdrop-blur-md border border-border rounded-[2rem] p-8 md:p-10 shadow-xl shadow-black/5 flex items-center justify-between overflow-hidden">
+                <div className="absolute top-0 right-0 bg-emerald-500/10 border-b border-l border-emerald-500/20 px-4 py-1.5 rounded-bl-[1.5rem] flex items-center justify-center">
+                  <span className="text-[9px] font-black uppercase text-emerald-500 tracking-widest leading-none mt-0.5">Hot</span>
+                </div>
                 <div>
                   <h4 className="text-base font-black text-text mb-1" style={{ fontFamily: "var(--font-display)" }}>Public Visibility</h4>
-                  <p className="text-sm text-text-secondary max-w-xs">Make your portfolio indexable and public to recruiters.</p>
+                  <p className="text-sm text-text-secondary max-w-xs transition-colors">Publish your professional brand to the web and allow anyone to discover your profile.</p>
                 </div>
                 <Toggle enabled={publicVisibility} onChange={() => handleToggle("publicVisibility", publicVisibility, setPublicVisibility)} />
+              </section>
+
+              {/* ── ECOSYSTEM CROSS-PROMO ── */}
+              <section className="relative overflow-hidden bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 border border-violet-500/20 rounded-[2rem] p-8 md:p-10 shadow-xl shadow-black/5 mt-4">
+                <div className="absolute top-0 right-0 p-6 pointer-events-none opacity-5">
+                  <Globe className="w-40 h-40 text-violet-500 -rotate-12 translate-x-8 -translate-y-8" />
+                </div>
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                  <div className="max-w-md">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="px-2.5 py-1 rounded-md bg-violet-500/10 border border-violet-500/20 text-[9px] font-black uppercase text-violet-500 tracking-wider">Our Ecosystem</span>
+                    </div>
+                    <h3 className="text-xl font-black text-text mb-2" style={{ fontFamily: "var(--font-display)" }}>MiniLink<span className="text-violet-500">.</span></h3>
+                    <p className="text-sm text-text-secondary leading-relaxed mb-6 md:mb-0">
+                      Your portfolio tells your full story. For your quick social links, there's <span className="font-bold text-text">MiniLink</span>. Create a stunning, mobile-optimized link tree in seconds. Claim your free page before your name is taken.
+                    </p>
+                  </div>
+                  <a 
+                    href="https://minianonlink.vercel.app/" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="flex-shrink-0 group inline-flex items-center justify-center gap-2 h-12 px-8 bg-violet-500 hover:bg-violet-600 text-white rounded-xl text-sm font-black transition-all duration-300 shadow-[0_4px_20px_-4px_rgba(139,92,246,0.5)] hover:shadow-[0_8px_25px_-4px_rgba(139,92,246,0.7)] hover:-translate-y-1 active:translate-y-0 active:scale-95"
+                  >
+                    Claim your link 
+                    <ExternalLink className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  </a>
+                </div>
               </section>
             </div>
           )}
