@@ -47,8 +47,15 @@ export async function GET() {
       },
       isLive
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("[PORTFOLIO_PREVIEW_ERROR]", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    // Log more details if possible
+    if (error.message) console.error("Message:", error.message);
+    if (error.stack) console.error("Stack:", error.stack);
+    
+    return NextResponse.json({ 
+      error: "Internal Server Error",
+      details: error.message || "Unknown error"
+    }, { status: 500 });
   }
 }

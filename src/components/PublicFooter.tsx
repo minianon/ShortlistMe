@@ -54,14 +54,14 @@ export default function PublicFooter({
           <div className="flex flex-col items-center md:items-end gap-4">
             <button
               onClick={() => setIsTeamCanvasOpen(true)}
-              className="px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg active:scale-95"
+              className="px-6 py-3 rounded-xl text-sm font-bold transition-all shadow-lg hover:scale-105 active:scale-95"
               style={{ 
                 backgroundColor: themeColor, 
                 color: accentTextColor || textColor || "#ffffff",
                 boxShadow: `0 10px 15px -3px ${themeColor}33` 
               }}
             >
-              Meet the Team
+              About ShortlistMe
             </button>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] mt-2 opacity-50">
               © 2026 ShortlistMe. All rights reserved.

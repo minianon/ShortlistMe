@@ -98,7 +98,7 @@ export default function HomePage() {
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-6">
         {/* ── Hero Section ── */}
-        <section className="pt-32 pb-20 md:pt-44 md:pb-28 flex flex-col lg:flex-row items-center gap-16">
+        <section className="pt-44 pb-16 md:pt-52 md:pb-20 flex flex-col lg:flex-row items-center gap-16">
           <div className="flex-1 text-center lg:text-left relative z-10 w-full max-w-2xl mx-auto lg:mx-0">
 
 
@@ -221,7 +221,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="features" className="py-24 scroll-mt-32">
+        <section id="features" className="pt-16 pb-24 scroll-mt-32">
           <div className="mb-14 text-center">
 
             <h2
@@ -560,7 +560,7 @@ export default function HomePage() {
         </section>
 
         {/* ── How it Works Section ── */}
-        <section id="how-it-works" className="py-24 scroll-mt-32">
+        <section id="how-it-works" className="pt-16 pb-24 scroll-mt-32">
           <div className="text-center mb-16 relative">
 
             <h2
@@ -737,7 +737,7 @@ export default function HomePage() {
         </section>
 
         {/* ── FAQ Section ── */}
-        <section id="faq" className="py-24 max-w-3xl mx-auto relative px-6 md:px-0 scroll-mt-32">
+        <section id="faq" className="pt-16 pb-24 max-w-3xl mx-auto relative px-6 md:px-0 scroll-mt-32">
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
 
           <div className="text-center mb-16 relative">

@@ -31,7 +31,9 @@ import {
    Zap,
    Sparkles,
    GraduationCap,
-   Package
+   Package,
+   Link2,
+   Lock
 } from "lucide-react";
 import { CldUploadButton, CldUploadWidget } from 'next-cloudinary';
 
@@ -65,6 +67,7 @@ export default function PortfolioManagement() {
 
    const [loading, setLoading] = useState(true);
    const [publishing, setPublishing] = useState(false);
+   const [togglingPublic, setTogglingPublic] = useState(false);
    const [isEditing, setIsEditing] = useState(false);
    const [device, setDevice] = useState<"laptop" | "mobile">("laptop");
 
@@ -94,6 +97,24 @@ export default function PortfolioManagement() {
    }, []);
 
    useEffect(() => { fetchPreview(); }, [fetchPreview]);
+
+   const handleMakePublic = async () => {
+      setTogglingPublic(true);
+      try {
+         const res = await fetch("/api/user/profile", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ publicVisibility: true })
+         });
+         if (!res.ok) throw new Error("Failed to update visibility");
+         await fetchPreview(); // Refresh the state to hide the banner
+      } catch (err) {
+         console.error(err);
+         alert("Failed to make portfolio public");
+      } finally {
+         setTogglingPublic(false);
+      }
+   };
 
    const handlePublish = async () => {
       if (!draftData) return;
@@ -156,6 +177,29 @@ export default function PortfolioManagement() {
    return (
       <div className="flex-1 flex flex-col bg-background/50 pb-20">
          <div className="max-w-[1700px] mx-auto w-full px-6 md:px-12 lg:px-16 xl:px-24 pt-12">
+
+            {/* ── PRIVATE MODE ALERT ── */}
+            {state?.portfolio && !state.portfolio.isPublic && (
+               <div className="mb-8 p-6 bg-zinc-900/5 dark:bg-white/5 border border-emerald-500/20 rounded-[2.25rem] flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-in shadow-sm">
+                  <div className="flex items-center gap-4">
+                     <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                        <Lock className="w-6 h-6" />
+                     </div>
+                     <div>
+                        <h4 className="text-sm font-black text-text uppercase tracking-widest mb-1">Portfolio is Private</h4>
+                        <p className="text-xs text-text-secondary font-medium">Your work is currently hidden from the world. Only you can access this designer.</p>
+                     </div>
+                  </div>
+                  <button 
+                     onClick={handleMakePublic}
+                     disabled={togglingPublic}
+                     className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white rounded-xl text-xs font-black transition-all flex items-center gap-2 shrink-0 shadow-lg shadow-emerald-500/40 active:scale-95"
+                  >
+                     {togglingPublic ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Globe className="w-3.5 h-3.5" />}
+                     Make it Public
+                  </button>
+               </div>
+            )}
 
             {/* ── HEADER ── */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fade-in">
@@ -342,7 +386,7 @@ export default function PortfolioManagement() {
                                        <>
                                           <img src={draftData.photoUrl} className="w-full h-full object-cover" alt="Profile" />
                                           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/profile:opacity-100 transition-all flex items-center justify-center gap-2 backdrop-blur-[2px] rounded-3xl">
-                                             isCloudinaryConfigured ? (
+                                             {isCloudinaryConfigured ? (
                                                 <CldUploadWidget
                                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"}
                                                    options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme" }}
@@ -360,7 +404,19 @@ export default function PortfolioManagement() {
                                                 >
                                                    {({ open }) => (
                                                       <button
-                                                         onClick={() => open()}
+                                                         onClick={() => {
+
+                                                            if (typeof open === "function") {
+
+                                                               open();
+
+                                                            } else {
+
+                                                               console.error("Cloudinary open function is undefined");
+
+                                                            }
+
+                                                         }}
                                                          className="p-2 bg-white/10 hover:bg-white/20 rounded-xl text-white backdrop-blur-md transition-all border border-white/20 shadow-xl"
                                                          title="Change Photo"
                                                       >
@@ -376,7 +432,7 @@ export default function PortfolioManagement() {
                                                 >
                                                    <Upload className="w-4 h-4" />
                                                 </button>
-                                           )
+                                           )}
                                              <button
                                                 onClick={() => setDraftData({ ...draftData, photoUrl: null })}
                                                 className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-red-100 backdrop-blur-md transition-all border border-red-500/20 shadow-xl"
@@ -405,7 +461,19 @@ export default function PortfolioManagement() {
                                           >
                                              {({ open }) => (
                                                 <button
-                                                   onClick={() => open()}
+                                                   onClick={() => {
+
+                                                      if (typeof open === "function") {
+
+                                                         open();
+
+                                                      } else {
+
+                                                         console.error("Cloudinary open function is undefined");
+
+                                                      }
+
+                                                   }}
                                                    className="w-full h-full flex flex-col items-center justify-center gap-2 text-text-muted hover:text-emerald-500 transition-colors"
                                                 >
                                                    <div className="p-3 bg-background-secondary rounded-xl group-hover:scale-110 transition-transform">
@@ -478,6 +546,50 @@ export default function PortfolioManagement() {
                                              className="w-full bg-background border border-border py-3 pl-9 pr-3 rounded-xl text-sm font-bold outline-none"
                                           />
                                        </div>
+                                    </div>
+                                 </div>
+                                 <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-1.5">
+                                       <label className="text-[9px] font-bold text-text-muted uppercase tracking-[0.1em] ml-1">LinkedIn URL</label>
+                                       <div className="relative">
+                                          <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
+                                          <input
+                                             value={draftData.linkedin || ""}
+                                             onChange={(e) => setDraftData({ ...draftData, linkedin: e.target.value })}
+                                             className="w-full bg-background border border-border py-3 pl-9 pr-3 rounded-xl text-sm font-bold outline-none"
+                                             placeholder="linkedin.com/in/..."
+                                          />
+                                       </div>
+                                    </div>
+                                    <div className="flex flex-col gap-1.5">
+                                       <label className="text-[9px] font-bold text-text-muted uppercase tracking-[0.1em] ml-1">GitHub URL</label>
+                                       <div className="relative">
+                                          <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
+                                          <input
+                                             value={draftData.github || ""}
+                                             onChange={(e) => setDraftData({ ...draftData, github: e.target.value })}
+                                             className="w-full bg-background border border-border py-3 pl-9 pr-3 rounded-xl text-sm font-bold outline-none"
+                                             placeholder="github.com/..."
+                                          />
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-1.5">
+                                       <label className="text-[9px] font-bold text-text-muted uppercase tracking-[0.1em] ml-1">X (Twitter) URL</label>
+                                       <div className="relative">
+                                          <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted" />
+                                          <input
+                                             value={draftData.twitter || ""}
+                                             onChange={(e) => setDraftData({ ...draftData, twitter: e.target.value })}
+                                             className="w-full bg-background border border-border py-3 pl-9 pr-3 rounded-xl text-sm font-bold outline-none"
+                                             placeholder="x.com/..."
+                                          />
+                                       </div>
+                                    </div>
+                                    <div className="flex flex-col gap-1.5 opacity-0 pointer-events-none">
+                                       <label className="text-[9px] font-bold text-text-muted uppercase tracking-[0.1em] ml-1">Empty</label>
+                                       <input className="w-full bg-background border border-border py-3 rounded-xl text-sm font-bold outline-none" />
                                     </div>
                                  </div>
                               </div>
@@ -740,7 +852,7 @@ export default function PortfolioManagement() {
                                           <>
                                              <img src={proj.imageUrl} className="w-full h-full object-cover" alt="Project Preview" />
                                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
-                                             isCloudinaryConfigured ? (
+                                                 {isCloudinaryConfigured ? (
                                                 <CldUploadWidget 
                                                    uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"}
                                                    options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme" }}
@@ -773,7 +885,19 @@ export default function PortfolioManagement() {
                                                 >
                                                    {({ open }) => (
                                                       <button 
-                                                         onClick={() => open()}
+                                                         onClick={() => {
+ 
+                                                            if (typeof open === "function") {
+ 
+                                                               open();
+ 
+                                                            } else {
+ 
+                                                               console.error("Cloudinary open function is undefined");
+ 
+                                                            }
+ 
+                                                         }}
                                                          className="p-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-white backdrop-blur-md transition-all border border-white/20 shadow-xl"
                                                       >
                                                          <PenTool className="w-4 h-4" />
@@ -787,7 +911,7 @@ export default function PortfolioManagement() {
                                                 >
                                                    <Upload className="w-4 h-4" />
                                                 </button>
-                                           )
+                                           )}
                                              <button 
                                                 onClick={() => {
                                                    const next = [...(draftData.projects || [])];
@@ -801,7 +925,7 @@ export default function PortfolioManagement() {
                                           </div>
                                        </>
                                     ) : (
-                                       isCloudinaryConfigured ? (
+                                        isCloudinaryConfigured ? (
                                           <CldUploadWidget
                                              uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "shortlistme_v1"} 
                                              options={{ folder: process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || "shortlistme", cropping: false }}
@@ -835,7 +959,13 @@ export default function PortfolioManagement() {
                                           >
                                              {({ open }) => (
                                                 <button
-                                                   onClick={() => open()}
+                                                   onClick={() => {
+                                                      if (typeof open === 'function') {
+                                                         open();
+                                                      } else {
+                                                         console.error('Cloudinary open function is undefined (Project New)');
+                                                      }
+                                                   }}
                                                    className="w-full h-full flex flex-col items-center justify-center gap-2 text-text-muted hover:text-emerald-500 transition-colors group/btn"
                                                 >
                                                    <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center border border-border group-hover/btn:scale-110 group-hover/btn:border-emerald-500/50 transition-all shadow-sm">
