@@ -222,14 +222,33 @@ export default function DashboardHome() {
       const fd = new FormData();
       fd.append("file", file);
       const r = await fetch("/api/resume/upload", { method: "POST", body: fd });
+      if (!r.ok) {
+        const contentType = r.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const j = await r.json();
+          throw new Error(j.error ?? "Upload failed");
+        } else {
+          const text = await r.text();
+          if (r.status === 413) throw new Error("File too large (max 4.5MB).");
+          throw new Error(`Upload failed (${r.status}): Server returned invalid response.`);
+        }
+      }
       const j = await r.json();
-      if (!r.ok) throw new Error(j.error ?? "Upload failed");
     } catch (e: any) { setError(e.message); setStage("error"); return; }
     setStage("generating");
     try {
       const r = await fetch("/api/portfolio/generate", { method: "POST" });
+      if (!r.ok) {
+        const contentType = r.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const j = await r.json();
+          throw new Error(j.error ?? "Generation failed");
+        } else {
+          if (r.status === 504) throw new Error("AI generation timed out. Please try again.");
+          throw new Error(`Generation failed (${r.status}): Server returned invalid response.`);
+        }
+      }
       const j = await r.json();
-      if (!r.ok) throw new Error(j.error ?? "Generation failed");
       setStage("done");
       fetchData(true);
     } catch (e: any) { setError(e.message); setStage("error"); }
