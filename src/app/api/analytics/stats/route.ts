@@ -37,74 +37,92 @@ export async function GET(req: NextRequest) {
     currentStart.setHours(0, 0, 0, 0);
     previousStart.setHours(0, 0, 0, 0);
 
-    // 2. Fetch all relevant data for the double timeframe (to compare current vs previous)
-    const [visits, linkClicks] = await Promise.all([
-      prisma.analyticsVisit.findMany({
-        where: {
-          portfolioId: portfolio.id,
-          createdAt: { gte: previousStart },
-        },
-        orderBy: { createdAt: "asc" },
+    // 2. Fetch Aggregated Metrics
+    const [
+      currentViews,
+      previousViews,
+      currentUniques,
+      previousUniques,
+      currentClicks,
+      previousClicks,
+      currentTime,
+      previousTime,
+      dailyVisits,
+      dailyClicks,
+      referrersRaw,
+      platformsRaw
+    ] = await Promise.all([
+      prisma.analyticsVisit.count({ where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } } }),
+      prisma.analyticsVisit.count({ where: { portfolioId: portfolio.id, createdAt: { gte: previousStart, lt: currentStart } } }),
+      prisma.analyticsVisit.count({ where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } }, distinct: ['viewerIp'] }),
+      prisma.analyticsVisit.count({ where: { portfolioId: portfolio.id, createdAt: { gte: previousStart, lt: currentStart } }, distinct: ['viewerIp'] }),
+      prisma.linkClick.count({ where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } } }),
+      prisma.linkClick.count({ where: { portfolioId: portfolio.id, createdAt: { gte: previousStart, lt: currentStart } } }),
+      prisma.analyticsVisit.aggregate({ where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } }, _sum: { durationSeconds: true } }),
+      prisma.analyticsVisit.aggregate({ where: { portfolioId: portfolio.id, createdAt: { gte: previousStart, lt: currentStart } }, _sum: { durationSeconds: true } }),
+      // Chart Data: Grouped by day
+      prisma.$queryRaw`
+        SELECT DATE("createdAt") as date, COUNT(*)::int as views
+        FROM "AnalyticsVisit"
+        WHERE "portfolioId" = ${portfolio.id} AND "createdAt" >= ${currentStart}
+        GROUP BY DATE("createdAt")
+        ORDER BY date ASC
+      ` as Promise<{ date: Date, views: number }[]>,
+      prisma.$queryRaw`
+        SELECT DATE("createdAt") as date, COUNT(*)::int as clicks
+        FROM "LinkClick"
+        WHERE "portfolioId" = ${portfolio.id} AND "createdAt" >= ${currentStart}
+        GROUP BY DATE("createdAt")
+        ORDER BY date ASC
+      ` as Promise<{ date: Date, clicks: number }[]>,
+      // Referrers
+      prisma.analyticsVisit.groupBy({
+        by: ['referer'],
+        where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } },
+        _count: { _all: true },
+        orderBy: { _count: { referer: 'desc' } },
+        take: 10
       }),
-      prisma.linkClick.findMany({
-        where: {
-          portfolioId: portfolio.id,
-          createdAt: { gte: previousStart },
-        },
-        orderBy: { createdAt: "asc" },
-      }),
+      // Platforms (using userAgent - still needs some JS parsing but we'll fetch only what's needed)
+      prisma.analyticsVisit.groupBy({
+        by: ['userAgent'],
+        where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } },
+        _count: { _all: true },
+        orderBy: { _count: { userAgent: 'desc' } },
+        take: 50 // Fetch more for variety, then group in JS
+      })
     ]);
 
-    // Split data into Current and Previous periods
-    const currentVisits = visits.filter(v => v.createdAt >= currentStart);
-    const previousVisits = visits.filter(v => v.createdAt < currentStart);
-    
-    const currentClicks = linkClicks.filter(c => c.createdAt >= currentStart);
-    const previousClicks = linkClicks.filter(c => c.createdAt < currentStart);
-
-    // 3. Aggregate Data: Time Series (Current Period Only for graph)
+    // 3. Format Chart Data (Merging visits and clicks)
     const timeSeriesMap = new Map();
     for (let i = 0; i < days; i++) {
         const d = new Date(now.getTime() - (i * 24 * 60 * 60 * 1000));
-        const date = d.toISOString().split('T')[0];
-        timeSeriesMap.set(date, { date, views: 0, clicks: 0, visitors: new Set() });
+        const dateStr = d.toISOString().split('T')[0];
+        timeSeriesMap.set(dateStr, { date: dateStr, views: 0, clicks: 0 });
     }
 
-    currentVisits.forEach(v => {
-        const dayStr = v.createdAt.toISOString().split('T')[0];
-        if (timeSeriesMap.has(dayStr)) {
-            const entry = timeSeriesMap.get(dayStr);
-            entry.views += 1;
-            if (v.viewerIp) entry.visitors.add(v.viewerIp);
-        }
+    dailyVisits.forEach(v => {
+        const dStr = new Date(v.date).toISOString().split('T')[0];
+        if (timeSeriesMap.has(dStr)) timeSeriesMap.get(dStr).views = v.views;
     });
-
-    currentClicks.forEach(c => {
-        const dayStr = c.createdAt.toISOString().split('T')[0];
-        if (timeSeriesMap.has(dayStr)) {
-            timeSeriesMap.get(dayStr).clicks += 1;
-        }
+    dailyClicks.forEach(c => {
+        const dStr = new Date(c.date).toISOString().split('T')[0];
+        if (timeSeriesMap.has(dStr)) timeSeriesMap.get(dStr).clicks = c.clicks;
     });
 
     const chartData = Array.from(timeSeriesMap.values()).reverse();
 
-    // 4. Referrers & Platforms (Current Period)
-    const refererCounts = new Map();
-    currentVisits.forEach(v => {
-        const ref = v.referer || "Direct Traffic";
-        refererCounts.set(ref, (refererCounts.get(ref) || 0) + 1);
-    });
-
-    const referrers = Array.from(refererCounts.entries())
-        .map(([name, visits]) => ({ name, visits }))
-        .sort((a, b) => b.visits - a.visits)
-        .slice(0, 10);
+    // 4. Format Referrers & Platforms
+    const referrers = referrersRaw.map(r => ({
+        name: r.referer || "Direct Traffic",
+        visits: r._count._all
+    }));
 
     const platformCounts = new Map<string, { count: number, icon: string }>();
-    currentVisits.forEach(v => {
-        const ua = (v.userAgent || "").toLowerCase();
-        let os = "Unknown OS";
-        let browser = "Unknown Browser";
+    platformsRaw.forEach(p => {
+        const ua = (p.userAgent || "").toLowerCase();
+        let os = "Other";
+        let browser = "Other";
         let icon = "globe";
 
         if (ua.includes("windows")) { os = "Windows"; icon = "monitor"; }
@@ -119,34 +137,32 @@ export async function GET(req: NextRequest) {
         else if (ua.includes("safari") && !ua.includes("chrome")) browser = "Safari";
         
         const name = `${browser} on ${os}`;
+        const count = p._count._all;
         const existing = platformCounts.get(name) || { count: 0, icon };
-        platformCounts.set(name, { count: existing.count + 1, icon: existing.icon });
+        platformCounts.set(name, { count: existing.count + count, icon: existing.icon });
     });
 
-    const totalViews = currentVisits.length;
     const platforms = Array.from(platformCounts.entries())
-        .map(([name, data]) => ({ 
+        .map(([name, d]) => ({ 
             name, 
-            count: data.count, 
-            pct: totalViews > 0 ? Math.round((data.count / totalViews) * 100) : 0, 
-            icon: data.icon 
+            count: d.count, 
+            pct: currentViews > 0 ? Math.round((d.count / currentViews) * 100) : 0, 
+            icon: d.icon 
         }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 4);
 
-    // 5. Calculate Metrics & Growth (Scientific Period-over-Period)
+    // 5. Calculate Metrics & Growth
     const calcGrowth = (curr: number, prev: number) => {
       if (prev === 0) return curr > 0 ? 100 : 0;
       return Math.round(((curr - prev) / prev) * 100);
     };
 
-    // Current totals
-    const currentUniques = new Set(currentVisits.map(v => v.viewerIp)).size;
-    const currentTime = currentVisits.reduce((acc, v) => acc + (v.durationSeconds || 0), 0);
-    
-    // Previous totals
-    const previousUniques = new Set(previousVisits.map(v => v.viewerIp)).size;
-    const previousTime = previousVisits.reduce((acc, v) => acc + (v.durationSeconds || 0), 0);
+    const currentTimeTotal = currentTime._sum.durationSeconds || 0;
+    const previousTimeTotal = previousTime._sum.durationSeconds || 0;
+
+    const currentAvgTime = currentViews > 0 ? Math.round(currentTimeTotal / currentViews) : 0;
+    const previousAvgTime = previousViews > 0 ? Math.round(previousTimeTotal / previousViews) : 0;
 
     const formatTime = (totalSecs: number) => {
       const m = Math.floor(totalSecs / 60);
@@ -154,21 +170,18 @@ export async function GET(req: NextRequest) {
       return `${m}m ${s}s`;
     };
 
-    const currentAvgTime = currentVisits.length > 0 ? Math.round(currentTime / currentVisits.length) : 0;
-    const previousAvgTime = previousVisits.length > 0 ? Math.round(previousTime / previousVisits.length) : 0;
-
     return NextResponse.json({
       metrics: {
-        totalViews: currentVisits.length,
+        totalViews: currentViews,
         uniqueVisitors: currentUniques,
-        linkClicks: currentClicks.length,
-        totalTime: formatTime(currentTime),
+        linkClicks: currentClicks,
+        totalTime: formatTime(currentTimeTotal),
         avgTime: formatTime(currentAvgTime),
         growth: {
-          views: calcGrowth(currentVisits.length, previousVisits.length),
+          views: calcGrowth(currentViews, previousViews),
           visitors: calcGrowth(currentUniques, previousUniques),
-          clicks: calcGrowth(currentClicks.length, previousClicks.length),
-          time: calcGrowth(currentTime, previousTime),
+          clicks: calcGrowth(currentClicks, previousClicks),
+          time: calcGrowth(currentTimeTotal, previousTimeTotal),
           avgTime: calcGrowth(currentAvgTime, previousAvgTime)
         }
       },
@@ -176,6 +189,11 @@ export async function GET(req: NextRequest) {
       referrers,
       platforms
     });
+  } catch (error) {
+    console.error("[ANALYTICS_STATS_ERROR]", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
   } catch (error) {
     console.error("[ANALYTICS_STATS_ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

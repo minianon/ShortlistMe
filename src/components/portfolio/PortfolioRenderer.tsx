@@ -84,12 +84,13 @@ const XIcon = ({ className, style }: { className?: string, style?: any }) => (
   </svg>
 );
 
-export default function PortfolioRenderer({ 
+// Memoize the entire component to prevent unnecessary re-renders in the Studio
+const PortfolioRenderer = React.memo(({ 
   data, 
   isMobilePreview = false,
   portfolioId,
   visitId,
-}: PortfolioRendererProps) {
+}: PortfolioRendererProps) => {
   const styles = getThemeStyles(data);
   const visibility = data.visibility || DEFAULT_VISIBILITY;
 
@@ -441,4 +442,8 @@ export default function PortfolioRenderer({
       </main>
     </div>
   );
-}
+});
+
+PortfolioRenderer.displayName = "PortfolioRenderer";
+
+export default PortfolioRenderer;
