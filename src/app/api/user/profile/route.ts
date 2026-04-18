@@ -49,6 +49,17 @@ export async function PATCH(req: NextRequest) {
     ...(Object.keys(unsafeMetadata).length > 0 && { unsafeMetadata }),
   });
 
+  // Sync to local DB
+  if (firstName !== undefined || lastName !== undefined) {
+    await prisma.user.update({
+      where: { clerkUserId: userId },
+      data: {
+        ...(firstName !== undefined && { firstName }),
+        ...(lastName !== undefined && { lastName }),
+      }
+    });
+  }
+
   // Sync with Prisma Portfolio if publicVisibility is changed
   if (publicVisibility !== undefined) {
     const dbUser = await prisma.user.findUnique({
