@@ -266,6 +266,15 @@ export default function DashboardHome() {
   const isPublished = !!portfolio?.publishedVersionId;
   const portfolioData = (portfolio as any)?.versions?.[0]?.data ?? (portfolio as any)?.publishedVersion?.data ?? {};
 
+  // Dynamic Greeting based on time
+  const [greeting, setGreeting] = useState("Good morning");
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good morning");
+    else if (hour < 17) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+  }, []);
+
   // Dynamic app URL — matches the settings page pattern exactly
   const [appUrl, setAppUrl] = useState("");
   useEffect(() => {
@@ -395,7 +404,7 @@ export default function DashboardHome() {
             className="text-4xl lg:text-[2.75rem] font-black text-text tracking-tight leading-none"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Good evening, {firstName}<span className="text-emerald-500">.</span>
+            {greeting}, {firstName}<span className="text-emerald-500">.</span>
           </h1>
           <p className="text-text-secondary text-sm mt-2.5 leading-relaxed">
             {isPublished
