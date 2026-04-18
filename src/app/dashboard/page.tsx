@@ -283,7 +283,12 @@ export default function DashboardHome() {
   };
 
   const isProcessing = stage === "uploading" || stage === "generating";
-  const firstName = user?.firstName ?? "there";
+  
+  // Robust name fallback
+  const emailPrefix = user?.primaryEmailAddress?.emailAddress?.split('@')[0] || "";
+  const derivedFirstName = emailPrefix.split(/[\._-]/)[0];
+  const firstName = user?.firstName || (derivedFirstName ? derivedFirstName.charAt(0).toUpperCase() + derivedFirstName.slice(1) : "there");
+
   const hasPortfolio = !!portfolio;
   const isPublished = !!portfolio?.publishedVersionId;
   const portfolioData = (portfolio as any)?.versions?.[0]?.data ?? (portfolio as any)?.publishedVersion?.data ?? {};
@@ -392,7 +397,13 @@ export default function DashboardHome() {
   const navActions = [
     { icon: Edit3, label: "Portfolio Studio", sub: "Edit & publish your site", href: "/dashboard/portfolio?edit=true", badge: null },
     { icon: BarChart2, label: "Analytics", sub: "Views, clicks & engagement", href: "/dashboard/analytics", badge: totalViews > 0 ? totalViews.toLocaleString() : null },
-    { icon: FilePlus2, label: "Claim Username", sub: "Personalize your public URL", href: "/dashboard/settings?tab=General", badge: !user?.username ? "New" : null },
+    { 
+      icon: FilePlus2, 
+      label: "Personalize URL", 
+      sub: "Claim your custom brand link", 
+      href: "/dashboard/settings?tab=General", 
+      badge: portfolio?.slug && (portfolio.slug.startsWith("user_") || portfolio.slug.length > 20) ? "Action Required" : null 
+    },
     { icon: Settings, label: "Settings", sub: "Account & preferences", href: "/dashboard/settings", badge: null },
   ];
 
@@ -416,10 +427,10 @@ export default function DashboardHome() {
         className="py-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
       >
         <div>
-          {user?.username && (
+          {(user?.username || portfolio?.slug) && (
             <div className="inline-flex items-center gap-1.5 mb-3 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              @{user.username}
+              @{user?.username || portfolio?.slug}
             </div>
           )}
           <h1
