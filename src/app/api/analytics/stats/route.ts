@@ -41,8 +41,8 @@ export async function GET(req: NextRequest) {
     const [
       currentViews,
       previousViews,
-      currentUniques,
-      previousUniques,
+      currentUniquesResult,
+      previousUniquesResult,
       currentClicks,
       previousClicks,
       currentTime,
@@ -54,8 +54,16 @@ export async function GET(req: NextRequest) {
     ] = await Promise.all([
       prisma.analyticsVisit.count({ where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } } }),
       prisma.analyticsVisit.count({ where: { portfolioId: portfolio.id, createdAt: { gte: previousStart, lt: currentStart } } }),
-      prisma.analyticsVisit.count({ where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } }, distinct: ['viewerIp'] }),
-      prisma.analyticsVisit.count({ where: { portfolioId: portfolio.id, createdAt: { gte: previousStart, lt: currentStart } }, distinct: ['viewerIp'] }),
+      prisma.$queryRaw`
+        SELECT COUNT(DISTINCT "viewerIp")::int as count 
+        FROM "AnalyticsVisit" 
+        WHERE "portfolioId" = ${portfolio.id} AND "createdAt" >= ${currentStart}
+      ` as Promise<{ count: number }[]>,
+      prisma.$queryRaw`
+        SELECT COUNT(DISTINCT "viewerIp")::int as count 
+        FROM "AnalyticsVisit" 
+        WHERE "portfolioId" = ${portfolio.id} AND "createdAt" >= ${previousStart} AND "createdAt" < ${currentStart}
+      ` as Promise<{ count: number }[]>,
       prisma.linkClick.count({ where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } } }),
       prisma.linkClick.count({ where: { portfolioId: portfolio.id, createdAt: { gte: previousStart, lt: currentStart } } }),
       prisma.analyticsVisit.aggregate({ where: { portfolioId: portfolio.id, createdAt: { gte: currentStart } }, _sum: { durationSeconds: true } }),
@@ -92,6 +100,10 @@ export async function GET(req: NextRequest) {
         take: 50 // Fetch more for variety, then group in JS
       })
     ]);
+    
+    // Extract raw counts from query results
+    const currentUniques = Number(currentUniquesResult[0]?.count || 0);
+    const previousUniques = Number(previousUniquesResult[0]?.count || 0);
 
     // 3. Format Chart Data (Merging visits and clicks)
     const timeSeriesMap = new Map();
@@ -189,11 +201,6 @@ export async function GET(req: NextRequest) {
       referrers,
       platforms
     });
-  } catch (error) {
-    console.error("[ANALYTICS_STATS_ERROR]", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
-}
   } catch (error) {
     console.error("[ANALYTICS_STATS_ERROR]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
