@@ -50,7 +50,6 @@ async function extractTextAndLinksFromPDF(buffer: Buffer): Promise<string> {
   return fullText;
 }
 
-// Slugify a name into a URL-safe identifier
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -58,6 +57,19 @@ function slugify(text: string): string {
     .replace(/[^\w\s-]/g, "")
     .replace(/[\s_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function deriveInfoFromEmail(email?: string | null) {
+  if (!email) return { first: "", last: "", full: "", slug: "" };
+  const prefix = email.split('@')[0];
+  const parts = prefix.split(/[\._-]/);
+  
+  const first = parts[0]?.charAt(0).toUpperCase() + parts[0]?.slice(1) || "";
+  const last = parts.slice(1).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
+  const full = `${first} ${last}`.trim();
+  const slug = slugify(prefix);
+  
+  return { first, last, full, slug };
 }
 
 export const maxDuration = 60;
@@ -201,10 +213,14 @@ ${resumeText.slice(0, 8000)}`;
     const cookieStore = await cookies();
     const preferredSlug = cookieStore.get("claimed_slug")?.value;
 
-    const parsedName = (portfolioData.name as string | null) ||
-      `${clerkUser?.firstName || dbUser?.firstName || ""} ${clerkUser?.lastName || dbUser?.lastName || ""}`.trim();
+    const email = clerkUser?.primaryEmailAddress?.emailAddress;
+    const derived = deriveInfoFromEmail(email);
+
+    const fName = clerkUser?.firstName || dbUser?.firstName || "";
+    const lName = clerkUser?.lastName || dbUser?.lastName || "";
+    const parsedName = (portfolioData.name as string | null) || `${fName} ${lName}`.trim() || derived.full;
     
-    const baseSlug = preferredSlug || slugify(parsedName) || userId.slice(0, 8);
+    const baseSlug = preferredSlug || slugify(parsedName) || derived.slug || userId.slice(0, 8);
 
     // Ensure slug uniqueness by checking the DB (Case-Insensitive)
     let slug = baseSlug;

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 
-// Slugify a name into a URL-safe identifier
+// Helpers
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -13,25 +13,40 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+function deriveInfoFromEmail(email?: string | null) {
+  if (!email) return { first: "", last: "", full: "", slug: "" };
+  const prefix = email.split('@')[0];
+  const parts = prefix.split(/[\._-]/);
+  
+  const first = parts[0]?.charAt(0).toUpperCase() + parts[0]?.slice(1) || "";
+  const last = parts.slice(1).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
+  const full = `${first} ${last}`.trim();
+  const slug = slugify(prefix);
+  
+  return { first, last, full, slug };
+}
+
 export async function GET() {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const clerkUser = await currentUser();
+  const email = clerkUser?.primaryEmailAddress?.emailAddress;
+  const derived = deriveInfoFromEmail(email);
 
   // 1. Auto-provision the user in the database
   const dbUser = await prisma.user.upsert({
     where: { clerkUserId: userId },
     create: {
       clerkUserId: userId,
-      email: clerkUser?.primaryEmailAddress?.emailAddress ?? null,
-      firstName: clerkUser?.firstName ?? null,
-      lastName: clerkUser?.lastName ?? null,
+      email: email ?? null,
+      firstName: clerkUser?.firstName || derived.first || null,
+      lastName: clerkUser?.lastName || derived.last || null,
     },
     update: {
-      email: clerkUser?.primaryEmailAddress?.emailAddress ?? null,
-      firstName: clerkUser?.firstName ?? null,
-      lastName: clerkUser?.lastName ?? null,
+      email: email ?? null,
+      firstName: clerkUser?.firstName || derived.first || null,
+      lastName: clerkUser?.lastName || derived.last || null,
     },
     select: { id: true, firstName: true, lastName: true },
   });
@@ -64,8 +79,11 @@ export async function GET() {
     const preferredSlug = cookieStore.get("claimed_slug")?.value;
 
     // Generate a unique slug based on their name or fallbacks
-    const parsedName = `${clerkUser?.firstName || dbUser.firstName || ""} ${clerkUser?.lastName || dbUser.lastName || ""}`.trim();
-    const baseSlug = preferredSlug || slugify(parsedName) || userId.slice(0, 8);
+    const fName = clerkUser?.firstName || dbUser.firstName || "";
+    const lName = clerkUser?.lastName || dbUser.lastName || "";
+    const parsedName = `${fName} ${lName}`.trim() || derived.full;
+    
+    const baseSlug = preferredSlug || slugify(parsedName) || derived.slug || userId.slice(0, 8);
     
     let slug = baseSlug;
     let attempt = 0;
