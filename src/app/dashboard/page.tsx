@@ -176,7 +176,11 @@ export default function DashboardHome() {
   const [portfolio, setPortfolio] = useState<PortfolioStatus | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  
+  const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
+  const [isNotificationsLoading, setIsNotificationsLoading] = useState(true);
+  const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(true);
+
   const [stage, setStage] = useState<Stage>("idle");
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -188,32 +192,50 @@ export default function DashboardHome() {
     }
   }, [stage, router]);
 
-  const fetchData = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
+  const fetchPortfolio = useCallback(async () => {
+    setIsPortfolioLoading(true);
     try {
-      const [portfolioRes, notifRes, analyticsRes] = await Promise.all([
-        fetch("/api/portfolio/status").catch(() => null),
-        fetch("/api/notifications").catch(() => null),
-        fetch("/api/analytics/stats").catch(() => null),
-      ]);
-      if (portfolioRes?.ok) {
-        const d = await portfolioRes.json().catch(() => ({}));
+      const res = await fetch("/api/portfolio/status");
+      if (res.ok) {
+        const d = await res.json();
         setPortfolio(d.portfolio ?? null);
       }
-      if (notifRes?.ok) {
-        const d = await notifRes.json().catch(() => []);
-        setNotifications(Array.isArray(d) ? d : d.notifications ?? []);
-      }
-      if (analyticsRes?.ok) {
-        const d = await analyticsRes.json().catch(() => null);
-        setAnalytics(d);
-      }
     } finally {
-      setLoading(false);
+      setIsPortfolioLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  const fetchNotifications = useCallback(async () => {
+    setIsNotificationsLoading(true);
+    try {
+      const res = await fetch("/api/notifications");
+      if (res.ok) {
+        const d = await res.json();
+        setNotifications(Array.isArray(d) ? d : d.notifications ?? []);
+      }
+    } finally {
+      setIsNotificationsLoading(false);
+    }
+  }, []);
+
+  const fetchAnalytics = useCallback(async () => {
+    setIsAnalyticsLoading(true);
+    try {
+      const res = await fetch("/api/analytics/stats");
+      if (res.ok) {
+        const d = await res.json();
+        setAnalytics(d);
+      }
+    } finally {
+      setIsAnalyticsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPortfolio();
+    fetchNotifications();
+    fetchAnalytics();
+  }, [fetchPortfolio, fetchNotifications, fetchAnalytics]);
 
   const runPipeline = useCallback(async (file: File) => {
     setError(null);
@@ -250,9 +272,9 @@ export default function DashboardHome() {
       }
       const j = await r.json();
       setStage("done");
-      fetchData(true);
+      fetchPortfolio();
     } catch (e: any) { setError(e.message); setStage("error"); }
-  }, [fetchData]);
+  }, [fetchPortfolio]);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -382,7 +404,7 @@ export default function DashboardHome() {
   };
   const strengthStatus = getStrengthLabel();
 
-  if (loading) return <DashboardSkeleton />;
+  // Removed top-level loading check — we use inline skeletons now
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 md:px-10 pb-24">
@@ -407,7 +429,9 @@ export default function DashboardHome() {
             {greeting}, {firstName}<span className="text-emerald-500">.</span>
           </h1>
           <p className="text-text-secondary text-sm mt-2.5 leading-relaxed">
-            {isPublished
+            {isPortfolioLoading ? (
+               <span className="inline-block h-4 w-64 skeleton rounded-md align-middle" />
+            ) : isPublished
               ? "Your professional brand is live — keep it sharp and growing."
               : hasPortfolio
               ? "Your portfolio is drafted — review and launch to the world."
@@ -416,7 +440,9 @@ export default function DashboardHome() {
         </div>
 
         {/* Live Status Chip */}
-        {hasPortfolio && (
+        {isPortfolioLoading ? (
+          <div className="h-10 w-48 skeleton rounded-2xl" />
+        ) : hasPortfolio && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -447,9 +473,23 @@ export default function DashboardHome() {
         transition={{ delay: 0.05 }}
         className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
       >
-        <StatPill icon={Eye} label="Total Profile Views" value={totalViews} growth={viewGrowth} color="emerald" sparkData={viewSparkData} />
-        <StatPill icon={Users} label="Unique Visitors" value={totalVisitors} growth={visitorGrowth} color="violet" sparkData={visitorSparkData} />
-        <StatPill icon={Target} label="Profile Strength" value={strengthPct} growth={doneCount} color="sky" sparkData={strengthSparkData} />
+        {isAnalyticsLoading ? (
+            <>
+              <div className="h-44 skeleton rounded-3xl" />
+              <div className="h-44 skeleton rounded-3xl" />
+            </>
+          ) : (
+            <>
+              <StatPill icon={Eye} label="Total Profile Views" value={totalViews} growth={viewGrowth} color="emerald" sparkData={viewSparkData} />
+              <StatPill icon={Users} label="Unique Visitors" value={totalVisitors} growth={visitorGrowth} color="violet" sparkData={visitorSparkData} />
+            </>
+          )}
+        
+        {isPortfolioLoading ? (
+           <div className="h-44 skeleton rounded-3xl" />
+        ) : (
+           <StatPill icon={Target} label="Profile Strength" value={strengthPct} growth={doneCount} color="sky" sparkData={strengthSparkData} />
+        )}
       </motion.div>
 
       {/* ── MAIN GRID ── */}
@@ -641,56 +681,68 @@ export default function DashboardHome() {
 
             {/* Items */}
             <div>
-              {sortedChecklistItems.map((item, i) => {
-                const priorityStyles = {
-                  Must: "bg-red-500/10 text-red-400 border-red-500/20",
-                  Recommended: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                  Optional: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-                }[item.priority];
-
-                return (
-                  <div
-                    key={i}
-                    className="flex items-start gap-4 px-7 py-4 border-b border-[var(--dash-card-border)] last:border-0 group hover:bg-background-tertiary/30 transition-colors"
-                  >
-                    {/* Checkbox */}
-                    <div className={`w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
-                      item.done ? "bg-emerald-500 shadow-sm shadow-emerald-500/30" : "border-2 border-border"
-                    }`}>
-                      {item.done && <CheckCircle2 className="w-3 h-3 text-white" />}
+              {isPortfolioLoading ? (
+                [1,2,3,4,5].map(i => (
+                  <div key={i} className="flex items-start gap-4 px-7 py-4 border-b border-[var(--dash-card-border)] last:border-0">
+                    <div className="w-5 h-5 rounded-lg skeleton flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 space-y-2">
+                       <div className="h-3 w-32 skeleton rounded" />
+                       <div className="h-2 w-48 skeleton rounded" />
                     </div>
-
-                    {/* Label + hint — full block fades + strikes when done */}
-                    <div className={`flex-1 min-w-0 transition-all duration-300 ${item.done ? "opacity-40" : "opacity-100"}`}>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-xs font-bold transition-all ${item.done ? "line-through decoration-text/60 text-text" : "text-text"}`}>
-                          {item.label}
-                        </span>
-                        {!item.done && (
-                          <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${priorityStyles}`}>
-                            {item.priority}
-                          </span>
-                        )}
-                      </div>
-                      <span className={`text-[10px] mt-0.5 block transition-all ${item.done ? "line-through decoration-text-muted/50 text-text-muted" : "text-text-muted"}`}>
-                        {item.hint}
-                      </span>
-                    </div>
-
-                    {/* Action */}
-                    {item.done ? (
-                      <span className="text-[9px] font-black text-emerald-500 uppercase tracking-wider flex-shrink-0 mt-0.5">Done</span>
-                    ) : (
-                      <Link
-                        href={item.href}
-                        className="flex items-center gap-1 text-[9px] font-black text-text-muted uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity hover:text-emerald-500 flex-shrink-0 mt-0.5"
-                      >
-                        Add <ChevronRight className="w-2.5 h-2.5" />
-                      </Link>
-                    )}
                   </div>
-                );
-              })}
+                ))
+              ) : (
+                sortedChecklistItems.map((item, i) => {
+                  const priorityStyles = {
+                    Must: "bg-red-500/10 text-red-400 border-red-500/20",
+                    Recommended: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                    Optional: "bg-sky-500/10 text-sky-400 border-sky-500/20",
+                  }[item.priority];
+
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-start gap-4 px-7 py-4 border-b border-[var(--dash-card-border)] last:border-0 group hover:bg-background-tertiary/30 transition-colors"
+                    >
+                      {/* Checkbox */}
+                      <div className={`w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                        item.done ? "bg-emerald-500 shadow-sm shadow-emerald-500/30" : "border-2 border-border"
+                      }`}>
+                        {item.done && <CheckCircle2 className="w-3 h-3 text-white" />}
+                      </div>
+
+                      {/* Label + hint — full block fades + strikes when done */}
+                      <div className={`flex-1 min-w-0 transition-all duration-300 ${item.done ? "opacity-40" : "opacity-100"}`}>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-xs font-bold transition-all ${item.done ? "line-through decoration-text/60 text-text" : "text-text"}`}>
+                            {item.label}
+                          </span>
+                          {!item.done && (
+                            <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${priorityStyles}`}>
+                              {item.priority}
+                            </span>
+                          )}
+                        </div>
+                        <span className={`text-[10px] mt-0.5 block transition-all ${item.done ? "line-through decoration-text-muted/50 text-text-muted" : "text-text-muted"}`}>
+                          {item.hint}
+                        </span>
+                      </div>
+
+                      {/* Action */}
+                      {item.done ? (
+                        <span className="text-[9px] font-black text-emerald-500 uppercase tracking-wider flex-shrink-0 mt-0.5">Done</span>
+                      ) : (
+                        <Link
+                          href={item.href}
+                          className="flex items-center gap-1 text-[9px] font-black text-text-muted uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity hover:text-emerald-500 flex-shrink-0 mt-0.5"
+                        >
+                          Add <ChevronRight className="w-2.5 h-2.5" />
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </motion.section>
         </div>
@@ -764,7 +816,19 @@ export default function DashboardHome() {
               </span>
             </div>
 
-            {notifications.length === 0 ? (
+            {isNotificationsLoading ? (
+              <div className="p-5 space-y-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="w-7 h-7 rounded-xl skeleton flex-shrink-0" />
+                    <div className="flex-1 space-y-1.5 pt-1">
+                      <div className="h-2.5 w-3/4 skeleton rounded" />
+                      <div className="h-2 w-1/2 skeleton rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="px-6 py-12 flex flex-col items-center gap-3 text-center">
                 <div className="w-12 h-12 rounded-2xl bg-background-tertiary/60 flex items-center justify-center">
                   <Activity className="w-5 h-5 text-text-muted opacity-30" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, Suspense } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense, useDeferredValue } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -175,6 +175,7 @@ function PortfolioManagementContent() {
    const searchParams = useSearchParams();
    const [state, setState] = useState<PreviewState | null>(null);
    const [draftData, setDraftData] = useState<PortfolioData | null>(null);
+   const deferredDraftData = useDeferredValue(draftData);
 
    const isCloudinaryConfigured = !!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
@@ -1230,13 +1231,13 @@ function PortfolioManagementContent() {
                   <div className={`flex-1 flex justify-center items-start pt-32 pb-16 ${isEditing ? 'scale-[0.85] 2xl:scale-100 origin-top' : ''} transition-transform duration-500`}>
 
                      {device === "laptop" ? (() => {
-                        const styles = getThemeStyles(draftData);
+                        const styles = getThemeStyles(deferredDraftData || draftData);
                         return (
                            <div
                               className={`shadow-2xl rounded-3xl border overflow-hidden transition-all duration-700 flex flex-col ${isEditing ? 'max-w-[1200px] w-full' : 'w-full'}`}
                               style={{ backgroundColor: styles.surface, color: styles.text, borderColor: styles.border }}
                            >
-                              <PortfolioRenderer data={draftData} isMobilePreview={false} />
+                              <PortfolioRenderer data={deferredDraftData || draftData!} isMobilePreview={false} />
                               <PublicFooter
                                  primaryColor={styles.primaryHex}
                                  backgroundColor={styles.surface}
@@ -1247,7 +1248,7 @@ function PortfolioManagementContent() {
                            </div>
                         );
                      })() : (() => {
-                        const styles = getThemeStyles(draftData);
+                        const styles = getThemeStyles(deferredDraftData || draftData);
                         return (
                            /* Mobile Frame - Increased width to ~360px for better realism and space */
                            <div className="relative mx-auto border-[10px] border-[#111] rounded-[3rem] h-[750px] w-[360px] shadow-2xl overflow-hidden animate-fade-up ring-1 ring-white/10 flex flex-col">
@@ -1258,7 +1259,7 @@ function PortfolioManagementContent() {
                                  className="flex-1 overflow-y-auto no-scrollbar pt-6"
                                  style={{ backgroundColor: styles.surface, color: styles.text }}
                               >
-                                 <PortfolioRenderer data={draftData} isMobilePreview={true} />
+                                 <PortfolioRenderer data={deferredDraftData || draftData!} isMobilePreview={true} />
                                  <PublicFooter
                                     primaryColor={styles.primaryHex}
                                     backgroundColor={styles.surface}
