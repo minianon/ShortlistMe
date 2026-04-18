@@ -59,17 +59,49 @@ function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-function deriveInfoFromEmail(email?: string | null) {
-  if (!email) return { first: "", last: "", full: "", slug: "" };
-  const prefix = email.split('@')[0];
+async function deriveInfoFromEmail(email?: string | null) {
+  if (!email) return { first: "", last: "", full: "", slug: "", derived: false };
+  
+  // Rule: Ignore numbers in the prefix
+  let prefix = email.split('@')[0].replace(/\d+/g, "");
+  if (!prefix) return { first: "", last: "", full: "", slug: "", derived: false };
+
   const parts = prefix.split(/[\._-]/);
   
-  const first = parts[0]?.charAt(0).toUpperCase() + parts[0]?.slice(1) || "";
-  const last = parts.slice(1).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
-  const full = `${first} ${last}`.trim();
-  const slug = slugify(prefix);
-  
-  return { first, last, full, slug };
+  if (parts.length > 1) {
+    const first = parts[0]?.charAt(0).toUpperCase() + parts[0]?.slice(1) || "";
+    const last = parts.slice(1).map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
+    const full = `${first} ${last}`.trim();
+    const slug = slugify(prefix);
+    return { first, last, full, slug, derived: true };
+  }
+
+  try {
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+    const completion = await groq.chat.completions.create({
+      model: "llama3-8b-8192",
+      messages: [
+        { role: "system", content: "Split the input into professional First and Last names. Output JSON: {\"first\":\"\",\"last\":\"\"}. No extra text. If only one name is possible, put it in 'first'." },
+        { role: "user", content: prefix }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0.1,
+    });
+    
+    const { first, last } = JSON.parse(completion.choices[0]?.message?.content || "{}");
+    if (first) {
+      return { 
+        first: first.charAt(0).toUpperCase() + first.slice(1), 
+        last: last ? last.charAt(0).toUpperCase() + last.slice(1) : "", 
+        full: `${first} ${last}`.trim(), 
+        slug: slugify(prefix),
+        derived: true 
+      };
+    }
+  } catch (e) {}
+
+  const fallback = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+  return { first: fallback, last: "", full: fallback, slug: slugify(prefix), derived: true };
 }
 
 export const maxDuration = 60;
@@ -214,7 +246,7 @@ ${resumeText.slice(0, 8000)}`;
     const preferredSlug = cookieStore.get("claimed_slug")?.value;
 
     const email = clerkUser?.primaryEmailAddress?.emailAddress;
-    const derived = deriveInfoFromEmail(email);
+    const derived = await deriveInfoFromEmail(email);
 
     const fName = clerkUser?.firstName || dbUser?.firstName || "";
     const lName = clerkUser?.lastName || dbUser?.lastName || "";
