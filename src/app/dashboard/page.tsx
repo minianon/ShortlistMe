@@ -199,11 +199,14 @@ export default function DashboardHome() {
       if (res.ok) {
         const d = await res.json();
         setPortfolio(d.portfolio ?? null);
+        if (d.clerkUpdated) {
+          user?.reload();
+        }
       }
     } finally {
       setIsPortfolioLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const fetchNotifications = useCallback(async () => {
     setIsNotificationsLoading(true);
@@ -311,13 +314,6 @@ export default function DashboardHome() {
   }, []);
 
   const checklistItems = [
-    {
-      label: "Professional Name",
-      hint: "Set your first and last name for your brand",
-      priority: "Must" as const,
-      done: !!user?.firstName && !!user?.lastName,
-      href: "/dashboard/settings?tab=Profile",
-    },
     {
       label: "Profile Summary",
       hint: "Write a 2–3 sentence bio about yourself",
