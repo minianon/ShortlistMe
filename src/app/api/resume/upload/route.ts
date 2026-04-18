@@ -8,7 +8,16 @@ export async function POST(req: Request) {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const user = await currentUser();
+    let user;
+    try {
+      user = await currentUser();
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 401 });
+      }
+    } catch (error) {
+      console.error("Clerk Error fetching currentUser:", error);
+      return NextResponse.json({ error: "Unauthorized or session expired" }, { status: 401 });
+    }
 
     const formData = await req.formData();
     const file = formData.get("file");

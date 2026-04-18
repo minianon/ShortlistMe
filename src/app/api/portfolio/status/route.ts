@@ -36,7 +36,7 @@ async function deriveInfoFromEmail(email?: string | null) {
   try {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const completion = await groq.chat.completions.create({
-      model: "llama3-8b-8192",
+      model: "llama-3.1-8b-instant",
       messages: [
         { role: "system", content: "Split the input into professional First and Last names. Output JSON: {\"first\":\"\",\"last\":\"\"}. No extra text. If only one name is possible, put it in 'first'." },
         { role: "user", content: prefix }
@@ -68,9 +68,25 @@ export async function GET() {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const clerkUser = await currentUser();
-  const email = clerkUser?.primaryEmailAddress?.emailAddress;
-  const derived = await deriveInfoFromEmail(email);
+  let clerkUser;
+  try {
+    clerkUser = await currentUser();
+    if (!clerkUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 401 });
+    }
+  } catch (error) {
+    console.error("Clerk Error fetching currentUser:", error);
+    return NextResponse.json({ error: "Unauthorized or session expired" }, { status: 401 });
+  }
+
+  const email = clerkUser.primaryEmailAddress?.emailAddress;
+  
+  // Only derive info if first name is missing in Clerk
+  let derived = { first: "", last: "", full: "", slug: "", derived: false };
+  if (clerkUser && !clerkUser.firstName) {
+    derived = await deriveInfoFromEmail(email);
+  }
+  
   let clerkUpdated = false;
 
   // Sync derived name back to Clerk if missing
