@@ -201,8 +201,8 @@ ${resumeText.slice(0, 8000)}`;
     const cookieStore = await cookies();
     const preferredSlug = cookieStore.get("claimed_slug")?.value;
 
-    const parsedName = (portfolioData.name as string | null) ??
-      `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim();
+    const parsedName = (portfolioData.name as string | null) ||
+      `${clerkUser?.firstName || dbUser?.firstName || ""} ${clerkUser?.lastName || dbUser?.lastName || ""}`.trim();
     
     const baseSlug = preferredSlug || slugify(parsedName) || userId.slice(0, 8);
 

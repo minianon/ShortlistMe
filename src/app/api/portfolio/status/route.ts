@@ -25,11 +25,15 @@ export async function GET() {
     create: {
       clerkUserId: userId,
       email: clerkUser?.primaryEmailAddress?.emailAddress ?? null,
+      firstName: clerkUser?.firstName ?? null,
+      lastName: clerkUser?.lastName ?? null,
     },
     update: {
       email: clerkUser?.primaryEmailAddress?.emailAddress ?? null,
+      firstName: clerkUser?.firstName ?? null,
+      lastName: clerkUser?.lastName ?? null,
     },
-    select: { id: true },
+    select: { id: true, firstName: true, lastName: true },
   });
 
   // 2. Ensure the user has a portfolio (auto-provision one so they have a slug)
@@ -60,7 +64,7 @@ export async function GET() {
     const preferredSlug = cookieStore.get("claimed_slug")?.value;
 
     // Generate a unique slug based on their name or fallbacks
-    const parsedName = `${clerkUser?.firstName ?? ""} ${clerkUser?.lastName ?? ""}`.trim();
+    const parsedName = `${clerkUser?.firstName || dbUser.firstName || ""} ${clerkUser?.lastName || dbUser.lastName || ""}`.trim();
     const baseSlug = preferredSlug || slugify(parsedName) || userId.slice(0, 8);
     
     let slug = baseSlug;

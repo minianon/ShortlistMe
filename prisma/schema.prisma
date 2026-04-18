@@ -16,6 +16,8 @@ model User {
   id          String    @id @default(cuid())
   clerkUserId String    @unique
   email       String?
+  firstName   String?
+  lastName    String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
