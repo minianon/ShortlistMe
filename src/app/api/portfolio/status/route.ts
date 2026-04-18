@@ -1,4 +1,4 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
@@ -33,6 +33,15 @@ export async function GET() {
   const clerkUser = await currentUser();
   const email = clerkUser?.primaryEmailAddress?.emailAddress;
   const derived = deriveInfoFromEmail(email);
+
+  // Sync derived name back to Clerk if missing
+  if (clerkUser && !clerkUser.firstName && derived.first) {
+    const client = await clerkClient();
+    await client.users.updateUser(userId, {
+      firstName: derived.first,
+      lastName: derived.last,
+    });
+  }
 
   // 1. Auto-provision the user in the database
   const dbUser = await prisma.user.upsert({

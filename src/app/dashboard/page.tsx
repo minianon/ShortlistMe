@@ -312,6 +312,13 @@ export default function DashboardHome() {
 
   const checklistItems = [
     {
+      label: "Professional Name",
+      hint: "Set your first and last name for your brand",
+      priority: "Must" as const,
+      done: !!user?.firstName && !!user?.lastName,
+      href: "/dashboard/settings?tab=Profile",
+    },
+    {
       label: "Profile Summary",
       hint: "Write a 2–3 sentence bio about yourself",
       priority: "Must" as const,

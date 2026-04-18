@@ -40,7 +40,7 @@ export default function SignInPage() {
           {/* Header */}
           <div className="flex flex-col items-center text-center mb-10">
             <div className="inline-flex items-center justify-center p-3 bg-emerald-500/10 rounded-2xl mb-6 shadow-[inset_0_0_20px_rgba(16,185,129,0.1)] ring-1 ring-emerald-500/20">
-              <Sparkles className="w-6 h-6 text-emerald-500" strokeWidth={2.5} />
+              <img src="/icon.svg" alt="ShortlistMe Logo" className="w-6 h-6" />
             </div>
             <h1
               style={{ fontFamily: "var(--font-display)" }}
