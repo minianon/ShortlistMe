@@ -714,9 +714,9 @@ export default function HomePage() {
                         <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 shrink-0 border border-emerald-500/20">
                           <Globe className="w-6 h-6" />
                         </div>
-                        <div className="flex-1 overflow-hidden">
-                          <div className="text-[10px] text-text-muted font-bold tracking-widest uppercase mb-1">Your Live Domain</div>
-                          <div className="text-text font-medium truncate text-lg">shortlistme.com/<span className="text-emerald-500 font-bold">johndoe</span></div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[10px] text-white/40 font-bold tracking-widest uppercase mb-1">Your Live Domain</div>
+                          <div className="text-white font-medium truncate text-lg">shortlistme.site/<span className="text-emerald-500 font-bold">tushar</span></div>
                         </div>
                         <div className="bg-emerald-500 text-background font-bold text-xs px-5 py-3 rounded-xl cursor-default flex items-center gap-2 shrink-0">
                           <Copy className="w-4 h-4" /> Copy

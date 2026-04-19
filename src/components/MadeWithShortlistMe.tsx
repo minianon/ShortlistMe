@@ -79,7 +79,7 @@ export default function MadeWithShortlistMe({ username, themeStyles }: { usernam
             </p>
             
             <Link 
-              href={`/sign-up?ref=portfolio_${username}`}
+              href={`/?ref=portfolio_${username}`}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-widest rounded-lg hover:-translate-y-0.5 transition-all active:scale-95 shadow-lg"
               style={{ 
                 backgroundColor: primaryHex, 
