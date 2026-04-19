@@ -952,4 +952,145 @@ div.theme-mockup-sync {
 .skill-tag:hover {
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ── Intro.js Custom WebApp Theme ── */
+.introjs-tooltip {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 1rem !important;
+  box-shadow: var(--shadow-float) !important;
+  font-family: var(--font-body) !important;
+}
+
+.introjs-tooltiptext,
+.introjs-tooltip-title,
+.introjs-tooltip-header {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.introjs-arrow.top {
+  border-bottom-color: var(--bg) !important;
+}
+.introjs-arrow.top-middle {
+  border-bottom-color: var(--bg) !important;
+}
+.introjs-arrow.top-right {
+  border-bottom-color: var(--bg) !important;
+}
+.introjs-arrow.bottom {
+  border-top-color: var(--bg) !important;
+}
+.introjs-arrow.bottom-middle {
+  border-top-color: var(--bg) !important;
+}
+.introjs-arrow.bottom-right {
+  border-top-color: var(--bg) !important;
+}
+.introjs-arrow.left {
+  border-right-color: var(--bg) !important;
+}
+.introjs-arrow.right {
+  border-left-color: var(--bg) !important;
+}
+
+.introjs-tooltipbuttons {
+  border-top: 1px solid var(--border) !important;
+  padding-top: 0.5rem !important;
+}
+
+.introjs-button {
+  background: var(--bg-tertiary) !important;
+  color: var(--text) !important;
+  text-shadow: none !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.5rem !important;
+  font-family: var(--font-body) !important;
+  font-weight: 600 !important;
+}
+
+.introjs-button:hover {
+  background: var(--bg) !important;
+  border-color: var(--text-secondary) !important;
+}
+
+.introjs-nextbutton {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary-dark) !important;
+}
+.introjs-nextbutton:hover {
+  background: var(--primary-dark) !important;
+  color: #fff !important;
+}
+
+.introjs-progressBar {
+  background-color: var(--primary) !important;
+}
+
+.introjs-progress {
+  background-color: var(--bg-tertiary) !important;
+  border-radius: 4px !important;
+}
+
+.introjs-helperLayer {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 2px dashed var(--primary) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.6) !important;
+}
+
+/* ── Intro.js Custom Skip Button ── */
+.introjs-tooltip-header .introjs-skipbutton {
+  right: 14px !important;
+  top: 14px !important;
+  width: 44px !important;
+  height: 22px !important;
+  padding: 0 !important;
+  background-color: var(--bg-tertiary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  text-decoration: none !important;
+  opacity: 0.8 !important;
+  transition: all 0.2s ease !important;
+
+  /* HIDE THE CROSS TEXT COMPLETELY */
+  color: transparent !important;
+  font-size: 0 !important;
+  text-shadow: none !important;
+  text-indent: 0 !important;
+  line-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.introjs-tooltip-header .introjs-skipbutton:hover {
+  background-color: var(--border) !important;
+  opacity: 1 !important;
+}
+
+.introjs-tooltip-header .introjs-skipbutton::after {
+  content: "SKIP";
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--text-secondary) !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+  font-family: var(--font-body) !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+}
+
+.introjs-tooltip-header .introjs-skipbutton * {
+  display: none !important;
 }

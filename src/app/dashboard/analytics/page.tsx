@@ -204,7 +204,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* ── Top Metric Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div id="tour-insights-metrics" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
          {metricCards.map((card, i) => (
            <div key={i} className="bg-background rounded-3xl p-6 shadow-sm border border-border hover:border-emerald-500/20 transition-all group">
               <div className="flex items-start justify-between mb-4">
@@ -227,7 +227,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* ── Main Graph ── */}
-      <div className={`bg-background rounded-[2rem] p-8 shadow-sm border border-border transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
+      <div id="tour-insights-graph" className={`bg-background rounded-[2rem] p-8 shadow-sm border border-border transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
             <div>
                <h2 className="text-xl font-black text-text mb-1" style={{ fontFamily: "var(--font-display)" }}>Visitor Trends</h2>
