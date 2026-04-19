@@ -130,13 +130,21 @@ export default function HomePage() {
 
             {/* Social Proof */}
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 text-xs tracking-wider font-bold text-text-secondary uppercase">
-              <div className="flex bg-background-tertiary px-3 py-1.5 rounded-full border border-border">
-                <div className="w-6 h-6 rounded-full bg-indigo-100 border-2 border-background shadow-sm"></div>
-                <div className="w-6 h-6 rounded-full bg-emerald-100 border-2 border-background -ml-2 shadow-sm"></div>
-                <div className="w-6 h-6 rounded-full bg-rose-100 border-2 border-background -ml-2 shadow-sm"></div>
-                <div className="w-6 h-6 rounded-full bg-amber-50 border-2 border-background -ml-2 flex items-center justify-center text-[9px] text-amber-700 font-black shadow-sm">+</div>
+              <div className="flex -space-x-2">
+                {[
+                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=faces",
+                  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+                  "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=48&h=48&fit=crop&crop=faces"
+                ].map((url, i) => (
+                  <img
+                    key={i}
+                    src={url}
+                    alt="User"
+                    className="w-6 h-6 rounded-full border-2 border-background object-cover bg-background-tertiary"
+                  />
+                ))}
               </div>
-              <span>Join 5,000+ early adopters</span>
+              <span>Join 100+ early adopters</span>
             </div>
           </div>
           <div className="flex-1 w-full max-w-lg mx-auto lg:max-w-none relative">
@@ -857,12 +865,21 @@ export default function HomePage() {
               </div>
 
               <div className="mt-10 text-white/30 text-xs font-bold tracking-wide flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/5">
-                <div className="flex">
-                  <div className="w-5 h-5 rounded-full bg-slate-800 border-2 border-[#0a0a0a]"></div>
-                  <div className="w-5 h-5 rounded-full bg-slate-700 border-2 border-[#0a0a0a] -ml-2"></div>
-                  <div className="w-5 h-5 rounded-full bg-slate-600 border-2 border-[#0a0a0a] -ml-2"></div>
+                <div className="flex -space-x-2">
+                  {[
+                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=48&h=48&fit=crop&crop=faces",
+                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=48&h=48&fit=crop&crop=faces",
+                    "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=48&h=48&fit=crop&crop=faces"
+                  ].map((url, i) => (
+                    <img
+                      key={i}
+                      src={url}
+                      alt="Creator"
+                      className="w-5 h-5 rounded-full border-2 border-[#0a0a0a] object-cover bg-slate-800"
+                    />
+                  ))}
                 </div>
-                <span>TRUSTED BY 5,000+ CREATORS</span>
+                <span>TRUSTED BY 100+ CREATORS</span>
               </div>
             </div>
           </div>

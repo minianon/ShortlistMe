@@ -335,7 +335,7 @@ function SettingsContent() {
                 <div className="space-y-6 mb-10">
                   <div>
                     <label className="block text-[10px] font-black text-text-secondary uppercase tracking-[0.2em] mb-3 ml-1">Handle / Slug</label>
-                    <div className="flex items-stretch rounded-xl overflow-hidden border border-border bg-background focus-within:border-emerald-500/40 focus-within:ring-4 focus-within:ring-emerald-500/5 transition-all">
+                    <div id="tour-settings-brand" className="flex items-stretch rounded-xl overflow-hidden border border-border bg-background focus-within:border-emerald-500/40 focus-within:ring-4 focus-within:ring-emerald-500/5 transition-all">
                       <div className="bg-background-secondary border-r border-border px-5 flex items-center">
                         <Globe className="w-4 h-4 text-text-muted" />
                         <span className="ml-2.5 text-xs font-bold text-text-secondary">{appUrl}</span>
@@ -399,7 +399,7 @@ function SettingsContent() {
                 </div>
               </section>
 
-              <section className="relative bg-background/40 backdrop-blur-md border border-border rounded-[2rem] p-8 md:p-10 shadow-xl shadow-black/5 flex items-center justify-between overflow-hidden">
+              <section id="tour-settings-visibility" className="relative bg-background/40 backdrop-blur-md border border-border rounded-[2rem] p-8 md:p-10 shadow-xl shadow-black/5 flex items-center justify-between overflow-hidden">
                 <div className="absolute top-0 right-0 bg-emerald-500/10 border-b border-l border-emerald-500/20 px-4 py-1.5 rounded-bl-[1.5rem] flex items-center justify-center">
                   <span className="text-[9px] font-black uppercase text-emerald-500 tracking-widest leading-none mt-0.5">Hot</span>
                 </div>
