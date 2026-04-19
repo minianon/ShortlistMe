@@ -94,12 +94,12 @@ function GuideContent() {
     if (currentPhase === "overview" && pathname === "/dashboard") {
       waitForElements(["#tour-sync-resume", "#tour-mission-control", "#tour-profile-strength", "#tour-notifications", ".tour-portfolio-studio"], () => {
         startTour([
-            { title: "Welcome to ShortlistMe", intro: "Let's take a quick tour!" },
-            { element: "#tour-sync-resume", intro: "Upload a fresh resume anytime to instantly sync and rebuild your portfolio.", position: "bottom" },
-            { element: "#tour-mission-control", intro: "Your Mission Control panel provides quick access to high-impact actions.", position: "bottom" },
-            { element: "#tour-profile-strength", intro: "Check your profile strength and complete recommended checklist items.", position: "bottom" },
-            { element: "#tour-notifications", intro: "Key updates and profile views appear here.", position: "bottom" },
-            getTourStep(".tour-portfolio-studio", { intro: "Let's move to Portfolio Studio to edit your design and view real-time previews.", position: "right" })
+            { title: "Welcome to ShortlistMe", intro: "<b>Welcome aboard!</b><br/><br/>Your AI-powered portfolio is just moments away. Let's take a quick tour to show you around your new command center." },
+            { element: "#tour-sync-resume", intro: "<b>Sync with Resume</b><br/><br/>Got a new job or updated skills? Drop your latest resume here to instantly rebuild your entire portfolio.", position: "bottom" },
+            { element: "#tour-mission-control", intro: "<b>Mission Control</b><br/><br/>This is your fast-track to everything important. Jump straight into editing, analytics, or settings from here.", position: "bottom" },
+            { element: "#tour-profile-strength", intro: "<b>Profile Strength</b><br/><br/>Make sure your profile stands out. We'll guide you step-by-step to achieve a perfect 100% completion.", position: "bottom" },
+            { element: "#tour-notifications", intro: "<b>Stay in the Loop</b><br/><br/>Any time a recruiter views your portfolio or you hit a milestone, we'll drop a little alert right here.", position: "bottom" },
+            getTourStep(".tour-portfolio-studio", { intro: "<b>Next Stop: Portfolio Studio</b><br/><br/>Ready to make it yours? Let's dive into the Studio to customize your theme and design.", position: "right" })
         ], () => {
           localStorage.setItem("shortlistme_tour_phase", "portfolio");
           router.push("/dashboard/portfolio?edit=true");
@@ -110,10 +110,10 @@ function GuideContent() {
     if (currentPhase === "portfolio" && pathname === "/dashboard/portfolio" && searchParams.get("edit") === "true") {
       waitForElements(["#tour-editor-sidebar", "#tour-preview-frame", ".tour-insights"], () => {
         startTour([
-            { title: "Portfolio Studio", intro: "Here you can customize every detail of your brand." },
-            { element: "#tour-editor-sidebar", intro: "Use the editor on the left to tweak content, themes, and identity.", position: "right" },
-            { element: "#tour-preview-frame", intro: "See real-time previews of your changes perfectly crafted.", position: "left" },
-            getTourStep(".tour-insights", { intro: "Next, let's explore Insights on how well your portfolio performs.", position: "right" })
+            { title: "Portfolio Studio", intro: "<b>Welcome to the Studio</b><br/><br/>This is where your professional brand comes to life. Customize every detail until it matches your brand." },
+            { element: "#tour-editor-sidebar", intro: "<b>The Editor</b><br/><br/>Tweak your experiences, configure layouts, and shape your identity using these core tools.", position: "right" },
+            { element: "#tour-preview-frame", intro: "<b>Real-time Preview</b><br/><br/>What you see is exactly what recruiters will get. Watch your changes compile in real-time right here.", position: "left" },
+            getTourStep(".tour-insights", { intro: "<b>Ready for Insights?</b><br/><br/>Once you publish, you'll want to see who's visiting. Let's check out the Analytics engine next.", position: "right" })
         ], () => {
           localStorage.setItem("shortlistme_tour_phase", "insights");
           router.push("/dashboard/analytics");
@@ -124,10 +124,10 @@ function GuideContent() {
     if (currentPhase === "insights" && pathname === "/dashboard/analytics") {
       waitForElements(["#tour-insights-metrics", "#tour-insights-graph", ".tour-settings"], () => {
         startTour([
-            { title: "Performance Insights", intro: "Analyze your reach and incoming traffic." },
-            { element: "#tour-insights-metrics", intro: "Monitor total unique visitors, views, and specific link clicks.", position: "bottom" },
-            { element: "#tour-insights-graph", intro: "Track dynamic trends over the selected time ranges.", position: "bottom" },
-            getTourStep(".tour-settings", { intro: "Finally, let's check your Settings.", position: "right" })
+            { title: "Performance Insights", intro: "<b>Your Command Center</b><br/><br/>Traffic is useless if you can't measure it. This is where you track your profile's organic reach." },
+            { element: "#tour-insights-metrics", intro: "<b>Key Metrics</b><br/><br/>Monitor unique visitors and track exactly how many people interacted with your custom links today.", position: "bottom" },
+            { element: "#tour-insights-graph", intro: "<b>Live Trends</b><br/><br/>Watch your growth curve by switching between different historical time ranges right here.", position: "bottom" },
+            getTourStep(".tour-settings", { intro: "<b>One last thing...</b><br/><br/>Let's wrap this up by taking a quick look at your custom portfolio settings.", position: "right" })
         ], () => {
           localStorage.setItem("shortlistme_tour_phase", "settings");
           router.push("/dashboard/settings?tab=General");
@@ -138,9 +138,9 @@ function GuideContent() {
     if (currentPhase === "settings" && pathname === "/dashboard/settings" && searchParams.get("tab") === "General") {
       waitForElements(["#tour-settings-brand", "#tour-settings-visibility"], () => {
         startTour([
-            { title: "General Settings", intro: "Your personalization hub." },
-            { element: "#tour-settings-brand", intro: "Reserve or modify your custom Brand URL handling here.", position: "bottom" },
-            { element: "#tour-settings-visibility", intro: "Quickly toggle your portfolio's public visibility. And that's all!", position: "bottom" }
+            { title: "General Settings", intro: "<b>Under the Hood</b><br/><br/>Welcome to your settings tab. You hold all the keys to your profile's engine right here." },
+            { element: "#tour-settings-brand", intro: "<b>Claim Your Brand</b><br/><br/>Want a professional link? Reserve your custom URL here before someone else takes it.", position: "bottom" },
+            { element: "#tour-settings-visibility", intro: "<b>Public Visibility</b><br/><br/>Not ready for the world to see your profile yet? Toggle this off anytime.<br/><br/><b>You're all set! Enjoy ShortlistMe.</b>", position: "bottom" }
         ], () => {
           localStorage.setItem("shortlistme_onboarding_done", "true");
           router.push("/dashboard");
