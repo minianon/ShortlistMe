@@ -4,7 +4,7 @@ import Link from "next/link";
 import { prisma } from "@/server/db";
 import { MapPin, Mail, Phone, Globe, FolderGit2, Link2, ArrowRight, Lock, Sparkles, UserPlus, Zap, Palette, ShieldCheck, Check } from "lucide-react";
 import PublicFooter from "@/components/PublicFooter";
-import HowItWorksAnimation from "@/components/HowItWorksAnimation";
+import HeroBrowserAnimation from "@/components/HeroBrowserAnimation";
 import { recordVisit } from "@/lib/analytics";
 
 import PortfolioRenderer from "@/components/portfolio/PortfolioRenderer";
@@ -181,7 +181,7 @@ function UnclaimedProfileView({ username, isLoggedIn }: { username: string, isLo
           <div className="relative animate-fade-up w-full" style={{ animationDelay: "400ms" }}>
             <div className="absolute -inset-4 bg-emerald-500/5 rounded-[3rem] blur-2xl -z-10" />
             <div className="relative z-10 p-2 bg-background border border-border/50 rounded-[2.5rem] shadow-2xl backdrop-blur-sm">
-              <HowItWorksAnimation />
+              <HeroBrowserAnimation username={username} />
             </div>
             <div>
               <p className="mt-6 text-center text-[10px] text-text-muted font-bold tracking-widest uppercase">
@@ -341,7 +341,7 @@ function PrivateProfileView({ username, themeStyles }: { username: string, theme
               style={{ backgroundColor: primary }}
             />
             <div className="relative z-10 p-2 bg-background border border-border/50 rounded-[2.5rem] shadow-2xl backdrop-blur-sm shadow-black/50">
-              <HowItWorksAnimation />
+              <HeroBrowserAnimation username={username} />
             </div>
             <p className="mt-6 text-center text-[10px] opacity-40 font-bold tracking-widest uppercase">
               Automate your professional storytelling.
