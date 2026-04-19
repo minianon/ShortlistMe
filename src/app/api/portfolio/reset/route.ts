@@ -6,7 +6,16 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const clerkUser = await currentUser();
+  let clerkUser;
+  try {
+    clerkUser = await currentUser();
+    if (!clerkUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 401 });
+    }
+  } catch (error) {
+    console.error("Clerk Error fetching currentUser:", error);
+    return NextResponse.json({ error: "Unauthorized or session expired" }, { status: 401 });
+  }
 
   try {
     const dbUser = await prisma.user.findUnique({
