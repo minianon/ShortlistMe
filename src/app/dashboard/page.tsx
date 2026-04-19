@@ -523,6 +523,15 @@ export default function DashboardHome() {
                 className="relative rounded-[2rem] overflow-hidden border border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent p-8 flex items-center gap-6"
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
+                
+                {/* 3s redirect progress bar */}
+                <motion.div 
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 3, ease: "linear" }}
+                  className="absolute bottom-0 left-0 h-1 bg-gradient-to-r from-emerald-500 to-emerald-400"
+                />
+
                 <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-xl shadow-emerald-500/30 flex-shrink-0">
                   <CheckCircle2 className="w-7 h-7 text-white" />
                 </div>
@@ -531,7 +540,7 @@ export default function DashboardHome() {
                   <p className="text-sm text-text-secondary mt-0.5">Opening Studio to review your details…</p>
                 </div>
                 <Link href="/dashboard/portfolio?edit=true" className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-colors">
-                  Open Studio <ArrowRight className="w-3.5 h-3.5" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> Redirecting...
                 </Link>
               </motion.div>
             ) : (
@@ -543,6 +552,7 @@ export default function DashboardHome() {
               >
                 {/* Premium Upload Card */}
                 <div
+                  id="tour-sync-resume"
                   className={`relative rounded-[2rem] border overflow-hidden transition-all group ${
                     isProcessing
                       ? "bg-[var(--dash-card-bg)] border-[var(--dash-card-border)]"
@@ -657,6 +667,7 @@ export default function DashboardHome() {
 
           {/* PORTFOLIO STRENGTH ── Premium redesign */}
           <motion.section
+            id="tour-profile-strength"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -766,6 +777,7 @@ export default function DashboardHome() {
 
           {/* MISSION CONTROL ── Premium bento tiles */}
           <motion.section
+            id="tour-mission-control"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.06 }}

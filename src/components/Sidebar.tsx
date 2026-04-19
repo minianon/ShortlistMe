@@ -93,16 +93,18 @@ export default function Sidebar() {
               const isActive = href === "/dashboard"
                 ? path === href
                 : path.startsWith(href);
+              const tourTarget = label === "Portfolio Studio" ? "tour-portfolio-studio" : label === "Insights" ? "tour-insights" : label === "Settings" ? "tour-settings" : "";
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-semibold text-sm transition-all duration-200 group ${
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl font-semibold text-sm transition-all duration-200 group ${tourTarget} ${
                     isActive
                       ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                       : "text-text-secondary hover:bg-background-tertiary hover:text-text"
                   } ${isCollapsed ? 'justify-center' : ''}`}
                   title={isCollapsed ? label : ""}
+                  data-tour-pos="right"
                 >
                   <Icon
                     className={`w-[18px] h-[18px] flex-shrink-0 transition-all ${
@@ -172,13 +174,15 @@ export default function Sidebar() {
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-[var(--dash-sidebar-border)] flex justify-around p-2 pb-[calc(0.5rem+env(safe-area-inset-bottom,0px))]">
         {NAV.map(({ href, Icon, label }) => {
           const isActive = href === "/dashboard" ? path === href : path.startsWith(href);
+          const tourTarget = label === "Portfolio Studio" ? "tour-portfolio-studio" : label === "Insights" ? "tour-insights" : label === "Settings" ? "tour-settings" : "";
           return (
             <Link
               key={href}
               href={href}
-              className={`flex flex-col items-center gap-1 p-2 rounded-lg text-[10px] font-bold ${
+              className={`flex flex-col items-center gap-1 p-2 rounded-lg text-[10px] font-bold ${tourTarget} ${
                 isActive ? "text-emerald-500" : "text-text-muted"
               }`}
+              data-tour-pos="top"
             >
               <Icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
               {label}
