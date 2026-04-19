@@ -2,6 +2,7 @@
 
 import Sidebar from "@/components/Sidebar";
 import ThemeToggle from "@/components/ThemeToggle";
+import OnboardingGuide from "@/components/OnboardingGuide";
 import { useUser } from "@clerk/nextjs";
 import { Bell, CheckCircle2, Globe, MousePointer2, TrendingUp, Zap, Trophy, Star, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect, useCallback, Suspense } from "react";
@@ -113,6 +114,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-[100dvh] bg-background-secondary">
+      <OnboardingGuide />
       <Sidebar />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -128,6 +130,7 @@ export default function DashboardLayout({
 
             <div className="relative" ref={notifRef}>
               <button 
+                id="tour-notifications"
                 onClick={() => setShowNotifications(!showNotifications)}
                 className={`relative w-9 h-9 rounded-xl bg-[var(--dash-upload-bg)] border ${showNotifications ? 'border-emerald-500/50 text-emerald-500 shadow-[0_0_15px_-3px_rgba(16,185,129,0.2)]' : 'border-[var(--dash-card-border)] text-text-secondary'} flex items-center justify-center hover:text-text hover:border-emerald-500/30 transition-all`}
               >
