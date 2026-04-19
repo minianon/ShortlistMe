@@ -14,7 +14,7 @@ import {
   MousePointer2, TrendingUp, Trophy, Star,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AreaChart, Area, ResponsiveContainer, Tooltip } from "recharts";
+import { AreaChart, Area, ResponsiveContainer, Tooltip, YAxis } from "recharts";
 
 // ── Types ──────────────────────────────────────────────
 
@@ -156,6 +156,7 @@ function StatPill({
                 <stop offset="95%" stopColor={colors.stroke} stopOpacity={0} />
               </linearGradient>
             </defs>
+            <YAxis hide domain={[0, (dataMax: number) => Math.max(10, dataMax)]} />
             <Area type="monotone" dataKey="v" stroke={colors.stroke} strokeWidth={1.5} fill={`url(#grad-${color})`} dot={false} />
             <Tooltip
               contentStyle={{ display: "none" }}
