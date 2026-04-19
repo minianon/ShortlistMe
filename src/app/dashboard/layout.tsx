@@ -2,7 +2,8 @@
 
 import Sidebar from "@/components/Sidebar";
 import ThemeToggle from "@/components/ThemeToggle";
-import OnboardingGuide from "@/components/OnboardingGuide";
+import dynamic from "next/dynamic";
+const OnboardingGuide = dynamic(() => import("@/components/OnboardingGuide"), { ssr: false });
 import { useUser } from "@clerk/nextjs";
 import { Bell, CheckCircle2, Globe, MousePointer2, TrendingUp, Zap, Trophy, Star, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect, useCallback, Suspense } from "react";
@@ -136,7 +137,9 @@ export default function DashboardLayout({
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 border-2 border-background-secondary rounded-full" />
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-emerald-500 border-2 border-background-secondary rounded-full flex items-center justify-center text-[9px] font-black text-white shadow-sm">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
                 )}
               </button>
 
