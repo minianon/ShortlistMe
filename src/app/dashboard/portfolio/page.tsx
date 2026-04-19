@@ -1207,7 +1207,7 @@ function PortfolioManagementContent() {
                )}
 
                {/* RIGHT: PREVIEW (Always visible) */}
-               <div id="tour-preview-frame" className="flex-1 bg-background-tertiary/5 border border-border/50 rounded-[3rem] flex flex-col relative xl:sticky xl:top-[120px] xl:h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
+               <div className="flex-1 bg-background-tertiary/5 border border-border/50 rounded-[3rem] flex flex-col relative xl:sticky xl:top-[120px] xl:h-[calc(100vh-180px)] overflow-y-auto custom-scrollbar">
 
                   {/* Device Toggle - Floating Top Center */}
                   <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 flex items-center bg-background/80 backdrop-blur-md border border-border p-1 rounded-xl shadow-xl transition-all duration-300">
@@ -1229,7 +1229,7 @@ function PortfolioManagementContent() {
 
 
                   {/* The Actual Display Plane */}
-                  <div className={`flex-1 flex justify-center items-start pt-32 pb-16 ${isEditing ? 'scale-[0.85] 2xl:scale-100 origin-top' : ''} transition-transform duration-500`}>
+                  <div id="tour-preview-frame" className={`flex-1 flex justify-center items-start pt-32 pb-16 ${isEditing ? 'scale-[0.85] 2xl:scale-100 origin-top' : ''} transition-transform duration-500`}>
 
                      {device === "laptop" ? (() => {
                         const styles = getThemeStyles(deferredDraftData || draftData);

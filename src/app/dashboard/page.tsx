@@ -64,18 +64,27 @@ function timeAgo(dateString: string) {
   return rtf.format(diffDays, "day");
 }
 
-// Generate sparkline data
-function generateSparkData(total: number, points = 7) {
+// Generate logical sparkline data for Strength (pronounced S-curve)
+function generateStrengthSparkData(percent: number, points = 15) {
+  return Array.from({ length: points }, (_, i) => {
+    const t = i / (points - 1);
+    // Pronounced ease-in-out to make the curve visible
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    return { v: percent * ease, day: i };
+  });
+}
+
+// Generate sparkline data as fallback (more dynamic variance)
+function generateSparkData(total: number, points = 15) {
   if (total === 0) return Array.from({ length: points }, (_, i) => ({ v: 0, day: i }));
   const arr: { v: number; day: number }[] = [];
-  let remaining = total;
-  for (let i = 0; i < points - 1; i++) {
-    const share = Math.round(remaining * (0.1 + Math.random() * 0.25));
-    arr.push({ v: share, day: i });
-    remaining -= share;
+  const base = total / points;
+  for (let i = 0; i < points; i++) {
+    // High variance to ensure "curves" are visible
+    const variance = (Math.random() - 0.5) * (base * 1.5);
+    arr.push({ v: Math.max(1, Math.round(base + variance)), day: i });
   }
-  arr.push({ v: Math.max(0, remaining), day: points - 1 });
-  return arr.sort((a, b) => a.day - b.day);
+  return arr;
 }
 
 // ── Skeleton ───────────────────────────────────────────
@@ -156,8 +165,20 @@ function StatPill({
                 <stop offset="95%" stopColor={colors.stroke} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <YAxis hide domain={[0, (dataMax: number) => Math.max(10, dataMax)]} />
-            <Area type="monotone" dataKey="v" stroke={colors.stroke} strokeWidth={1.5} fill={`url(#grad-${color})`} dot={false} />
+            <YAxis 
+              hide 
+              domain={label === "Profile Strength" ? [0, 100] : ['auto', 'auto']} 
+            />
+            <Area 
+              type="basis" 
+              dataKey="v" 
+              stroke={colors.stroke} 
+              strokeWidth={3} 
+              fill={`url(#grad-${color})`} 
+              dot={false} 
+              isAnimationActive={true}
+              animationDuration={2000}
+            />
             <Tooltip
               contentStyle={{ display: "none" }}
               cursor={false}
@@ -177,7 +198,7 @@ export default function DashboardHome() {
   const [portfolio, setPortfolio] = useState<PortfolioStatus | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
-  
+
   const [isPortfolioLoading, setIsPortfolioLoading] = useState(true);
   const [isNotificationsLoading, setIsNotificationsLoading] = useState(true);
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(true);
@@ -287,7 +308,7 @@ export default function DashboardHome() {
   };
 
   const isProcessing = stage === "uploading" || stage === "generating";
-  
+
   // Robust name fallback
   const emailPrefix = user?.primaryEmailAddress?.emailAddress?.split('@')[0] || "";
   const derivedFirstName = emailPrefix.split(/[\._-]/)[0];
@@ -394,19 +415,27 @@ export default function DashboardHome() {
   const totalVisitors = analytics?.metrics?.uniqueVisitors ?? 0;
   const viewGrowth = analytics?.metrics?.growth?.views ?? 0;
   const visitorGrowth = analytics?.metrics?.growth?.visitors ?? 0;
-  const viewSparkData = generateSparkData(totalViews);
-  const visitorSparkData = generateSparkData(totalVisitors);
-  const strengthSparkData = generateSparkData(strengthPct * 10, 7);
+
+  // Real graph data from API, fallback to generated if missing
+  const viewSparkData = analytics?.chartData?.length 
+    ? analytics.chartData.map((d: any, i: number) => ({ v: d.views, day: i }))
+    : generateSparkData(totalViews);
+    
+  const visitorSparkData = analytics?.chartData?.length 
+    ? analytics.chartData.map((d: any, i: number) => ({ v: Math.round(d.views * 0.8), day: i })) // Approximation for sparkline if daily uniques missing
+    : generateSparkData(totalVisitors);
+    
+  const strengthSparkData = generateStrengthSparkData(strengthPct, 7);
 
   const navActions = [
     { icon: Edit3, label: "Portfolio Studio", sub: "Edit & publish your site", href: "/dashboard/portfolio?edit=true", badge: null },
     { icon: BarChart2, label: "Analytics", sub: "Views, clicks & engagement", href: "/dashboard/analytics", badge: totalViews > 0 ? totalViews.toLocaleString() : null },
-    { 
-      icon: FilePlus2, 
-      label: "Personalize URL", 
-      sub: "Claim your custom brand link", 
-      href: "/dashboard/settings?tab=General", 
-      badge: portfolio?.slug && (portfolio.slug.startsWith("user_") || portfolio.slug.length > 20) ? "Action Required" : null 
+    {
+      icon: FilePlus2,
+      label: "Personalize URL",
+      sub: "Claim your custom brand link",
+      href: "/dashboard/settings?tab=General",
+      badge: portfolio?.slug && (portfolio.slug.startsWith("user_") || portfolio.slug.length > 20) ? "Action Required" : null
     },
     { icon: Settings, label: "Settings", sub: "Account & preferences", href: "/dashboard/settings", badge: null },
   ];
@@ -431,12 +460,6 @@ export default function DashboardHome() {
         className="py-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
       >
         <div>
-          {(user?.username || portfolio?.slug) && (
-            <div className="inline-flex items-center gap-1.5 mb-3 px-3 py-1 rounded-full border border-emerald-500/20 bg-emerald-500/5 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              @{user?.username || portfolio?.slug}
-            </div>
-          )}
           <h1
             className="text-4xl lg:text-[2.75rem] font-black text-text tracking-tight leading-none"
             style={{ fontFamily: "var(--font-display)" }}
@@ -445,12 +468,12 @@ export default function DashboardHome() {
           </h1>
           <p className="text-text-secondary text-sm mt-2.5 leading-relaxed">
             {isPortfolioLoading ? (
-               <span className="inline-block h-4 w-64 skeleton rounded-md align-middle" />
+              <span className="inline-block h-4 w-64 skeleton rounded-md align-middle" />
             ) : isPublished
               ? "Your professional brand is live — keep it sharp and growing."
               : hasPortfolio
-              ? "Your portfolio is drafted — review and launch to the world."
-              : "Upload your resume and go live in under 60 seconds."}
+                ? "Your portfolio is drafted — review and launch to the world."
+                : "Upload your resume and go live in under 60 seconds."}
           </p>
         </div>
 
@@ -463,11 +486,10 @@ export default function DashboardHome() {
             animate={{ opacity: 1, scale: 1 }}
             className="flex items-center gap-3 flex-shrink-0"
           >
-            <div className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-black ${
-              isPublished
-                ? "bg-emerald-500/8 border-emerald-500/20 text-emerald-500"
-                : "bg-amber-500/8 border-amber-500/20 text-amber-500"
-            }`}>
+            <div className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-black ${isPublished
+              ? "bg-emerald-500/8 border-emerald-500/20 text-emerald-500"
+              : "bg-amber-500/8 border-amber-500/20 text-amber-500"
+              }`}>
               <div className={`w-1.5 h-1.5 rounded-full ${isPublished ? "bg-emerald-500 animate-pulse shadow-[0_0_6px_theme(colors.emerald.500)]" : "bg-amber-400"}`} />
               {isPublished ? "Live" : "Draft"}
             </div>
@@ -489,21 +511,21 @@ export default function DashboardHome() {
         className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
       >
         {isAnalyticsLoading ? (
-            <>
-              <div className="h-44 skeleton rounded-3xl" />
-              <div className="h-44 skeleton rounded-3xl" />
-            </>
-          ) : (
-            <>
-              <StatPill icon={Eye} label="Total Profile Views" value={totalViews} growth={viewGrowth} color="emerald" sparkData={viewSparkData} />
-              <StatPill icon={Users} label="Unique Visitors" value={totalVisitors} growth={visitorGrowth} color="violet" sparkData={visitorSparkData} />
-            </>
-          )}
-        
-        {isPortfolioLoading ? (
-           <div className="h-44 skeleton rounded-3xl" />
+          <>
+            <div className="h-44 skeleton rounded-3xl" />
+            <div className="h-44 skeleton rounded-3xl" />
+          </>
         ) : (
-           <StatPill icon={Target} label="Profile Strength" value={strengthPct} growth={doneCount} color="sky" sparkData={strengthSparkData} />
+          <>
+            <StatPill icon={Eye} label="Total Profile Views" value={totalViews} growth={viewGrowth} color="emerald" sparkData={viewSparkData} />
+            <StatPill icon={Users} label="Unique Visitors" value={totalVisitors} growth={visitorGrowth} color="violet" sparkData={visitorSparkData} />
+          </>
+        )}
+
+        {isPortfolioLoading ? (
+          <div className="h-44 skeleton rounded-3xl" />
+        ) : (
+          <StatPill icon={Target} label="Profile Strength" value={strengthPct} growth={doneCount} color="sky" sparkData={strengthSparkData} />
         )}
       </motion.div>
 
@@ -524,9 +546,9 @@ export default function DashboardHome() {
                 className="relative rounded-[2rem] overflow-hidden border border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent p-8 flex items-center gap-6"
               >
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
-                
+
                 {/* 3s redirect progress bar */}
-                <motion.div 
+                <motion.div
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
                   transition={{ duration: 3, ease: "linear" }}
@@ -554,11 +576,10 @@ export default function DashboardHome() {
                 {/* Premium Upload Card */}
                 <div
                   id="tour-sync-resume"
-                  className={`relative rounded-[2rem] border overflow-hidden transition-all group ${
-                    isProcessing
-                      ? "bg-[var(--dash-card-bg)] border-[var(--dash-card-border)]"
-                      : "bg-[var(--dash-card-bg)] border-[var(--dash-card-border)] hover:border-emerald-500/40 cursor-pointer"
-                  }`}
+                  className={`relative rounded-[2rem] border overflow-hidden transition-all group ${isProcessing
+                    ? "bg-[var(--dash-card-bg)] border-[var(--dash-card-border)]"
+                    : "bg-[var(--dash-card-bg)] border-[var(--dash-card-border)] hover:border-emerald-500/40 cursor-pointer"
+                    }`}
                   onClick={() => !isProcessing && fileInputRef.current?.click()}
                 >
                   {/* Top shine line */}
@@ -569,9 +590,8 @@ export default function DashboardHome() {
 
                   <div className="flex flex-col sm:flex-row items-center gap-6 px-8 py-7">
                     {/* Animated Icon zone */}
-                    <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${
-                      isProcessing ? "bg-emerald-500/10" : "bg-emerald-500/8 group-hover:bg-emerald-500/15"
-                    }`}>
+                    <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${isProcessing ? "bg-emerald-500/10" : "bg-emerald-500/8 group-hover:bg-emerald-500/15"
+                      }`}>
                       {isProcessing ? (
                         <>
                           <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
@@ -668,7 +688,6 @@ export default function DashboardHome() {
 
           {/* PORTFOLIO STRENGTH ── Premium redesign */}
           <motion.section
-            id="tour-profile-strength"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -677,7 +696,7 @@ export default function DashboardHome() {
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
             {/* Header */}
-            <div className="px-7 pt-6 pb-5 border-b border-[var(--dash-card-border)]">
+            <div id="tour-profile-strength" className="px-7 pt-6 pb-5 border-b border-[var(--dash-card-border)]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center">
@@ -708,12 +727,12 @@ export default function DashboardHome() {
             {/* Items */}
             <div>
               {isPortfolioLoading ? (
-                [1,2,3,4,5].map(i => (
+                [1, 2, 3, 4, 5].map(i => (
                   <div key={i} className="flex items-start gap-4 px-7 py-4 border-b border-[var(--dash-card-border)] last:border-0">
                     <div className="w-5 h-5 rounded-lg skeleton flex-shrink-0 mt-0.5" />
                     <div className="flex-1 space-y-2">
-                       <div className="h-3 w-32 skeleton rounded" />
-                       <div className="h-2 w-48 skeleton rounded" />
+                      <div className="h-3 w-32 skeleton rounded" />
+                      <div className="h-2 w-48 skeleton rounded" />
                     </div>
                   </div>
                 ))
@@ -731,9 +750,8 @@ export default function DashboardHome() {
                       className="flex items-start gap-4 px-7 py-4 border-b border-[var(--dash-card-border)] last:border-0 group hover:bg-background-tertiary/30 transition-colors"
                     >
                       {/* Checkbox */}
-                      <div className={`w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
-                        item.done ? "bg-emerald-500 shadow-sm shadow-emerald-500/30" : "border-2 border-border"
-                      }`}>
+                      <div className={`w-5 h-5 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${item.done ? "bg-emerald-500 shadow-sm shadow-emerald-500/30" : "border-2 border-border"
+                        }`}>
                         {item.done && <CheckCircle2 className="w-3 h-3 text-white" />}
                       </div>
 
@@ -810,11 +828,10 @@ export default function DashboardHome() {
                     <p className="text-[10px] text-text-muted truncate">{item.sub}</p>
                   </div>
                   {item.badge && (
-                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full flex-shrink-0 ${
-                      item.badge === "New"
-                        ? "bg-violet-500/10 text-violet-400"
-                        : "bg-emerald-500/10 text-emerald-500"
-                    }`}>
+                    <span className={`text-[9px] font-black px-2 py-0.5 rounded-full flex-shrink-0 ${item.badge === "New"
+                      ? "bg-violet-500/10 text-violet-400"
+                      : "bg-emerald-500/10 text-emerald-500"
+                      }`}>
                       {item.badge}
                     </span>
                   )}
