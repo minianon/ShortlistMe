@@ -36,11 +36,13 @@ export default function Toast({ message, type, onClose }: ToastProps) {
       initial={{ opacity: 0, scale: 0.9, y: -20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 10 }}
-      className={`pointer-events-auto min-w-[320px] max-w-md p-4 rounded-2xl border backdrop-blur-xl shadow-2xl flex items-start gap-4 ring-1 ring-black/5 dark:ring-white/5 ${bgColors[type]} ${borderColors[type]}`}
+      className={`pointer-events-auto relative min-w-[320px] max-w-md p-4 rounded-2xl border backdrop-blur-xl shadow-2xl flex items-start gap-4 ring-1 ring-black/5 dark:ring-white/5 bg-white dark:bg-zinc-900 ${borderColors[type]}`}
     >
-      <div className="shrink-0 mt-0.5">{icons[type]}</div>
+      <div className={`absolute inset-0 rounded-2xl opacity-10 dark:opacity-20 ${bgColors[type]}`} />
       
-      <div className="flex-1">
+      <div className="relative shrink-0 mt-0.5">{icons[type]}</div>
+      
+      <div className="relative flex-1">
         <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">
           {type.charAt(0).toUpperCase() + type.slice(1)}
         </p>
