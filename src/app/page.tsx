@@ -1,43 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Sparkles, Check, Zap, Sliders, Palette, Share, UploadCloud, CheckCircle, ChevronDown, BarChart3, Globe, Search, TrendingUp, Copy, Link2 } from "lucide-react";
+import { Sparkles, Check, Zap, Sliders, Palette, Share, UploadCloud, CheckCircle, ChevronDown, BarChart3, Globe, Search, TrendingUp, Copy, Link2, Bell, User, Download, MessageSquare } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
 import PublicFooter from "@/components/PublicFooter";
+import HeroBrowserAnimation from "@/components/HeroBrowserAnimation";
 
 export default function HomePage() {
-  const [activeStep, setActiveStep] = useState(1);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
-  const [progress, setProgress] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // 1. Timer: Handles the 0-100% steady count
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setProgress((prev) => (prev >= 100 ? 100 : prev + 2));
-    }, 100);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
-
-  // 2. Step Logic: Handles transitioning when progress hits 100%
-  useEffect(() => {
-    if (progress >= 100) {
-      const timeout = setTimeout(() => {
-        setActiveStep((curr) => (curr === 3 ? 1 : curr + 1));
-        setProgress(0);
-      }, 100);
-      return () => clearTimeout(timeout);
-    }
-  }, [progress]);
-
-  const handleStepClick = (id: number) => {
-    setActiveStep(id);
-    setProgress(0);
-  };
 
   const VideoCard = ({ src, className = "" }: { src: string; className?: string }) => (
     <div className={`relative w-full h-full overflow-hidden rounded-2xl border border-border-strong/10 bg-black/5 ${className}`}>
@@ -70,7 +41,7 @@ export default function HomePage() {
             </Link>
 
             <nav className="hidden md:flex items-center gap-6">
-              {['Features', 'How it Works', 'FAQ'].map((item) => (
+              {['Features', 'See it in Action', 'FAQ'].map((item) => (
                 <Link
                   key={item}
                   href={`#${item.toLowerCase().replace(/ /g, '-')}`}
@@ -99,14 +70,14 @@ export default function HomePage() {
       <main className="flex-1 w-full max-w-7xl mx-auto px-6">
         {/* ── Hero Section ── */}
         <section className="pt-44 pb-16 md:pt-52 md:pb-20 flex flex-col lg:flex-row items-center gap-16">
-          <div className="flex-1 text-center lg:text-left relative z-10 w-full max-w-2xl mx-auto lg:mx-0">
+          <div className="flex-1 text-center lg:text-left relative z-20 w-full max-w-2xl mx-auto lg:mx-0">
 
 
             <h1
               style={{ fontFamily: "var(--font-display)" }}
               className="text-5xl md:text-6xl lg:text-[4.5rem] font-extrabold tracking-tight text-text mb-6 leading-[1.05]"
             >
-              Don't manually build a <span className="text-emerald-500 italic font-medium">portfolio.</span>
+              Don't manually build a <span className="text-emerald-500 italic font-medium underline underline-offset-[12px] decoration-emerald-500/20">portfolio.</span>
             </h1>
 
             <p className="text-lg text-text-secondary md:text-xl mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
@@ -147,85 +118,9 @@ export default function HomePage() {
               <span>Join 100+ early adopters</span>
             </div>
           </div>
-          <div className="flex-1 w-full max-w-lg mx-auto lg:max-w-none relative">
-            {/* The SaaS Browser Window */}
-            <div className="aspect-square md:aspect-[4/3] rounded-[1.5rem] md:rounded-[2rem] bg-[#0c0c0c] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-0 flex flex-col relative overflow-hidden animate-[heroBrowserGlow_6s_infinite_cubic-bezier(0.25,1,0.5,1)] w-full max-w-[540px] mx-auto transform-gpu transition-all">
 
-              {/* Browser Header */}
-              <div className="h-10 border-b border-white/5 flex items-center px-4 justify-between bg-white/[0.02] relative z-20">
-                <div className="flex gap-1.5 w-16">
-                  <div className="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                </div>
-                {/* Search / Progress Bar */}
-                <div className="flex-1 max-w-[160px] md:max-w-[200px] h-4 bg-white/5 rounded-full relative overflow-hidden">
-                  <div className="absolute inset-y-0 left-0 bg-emerald-500/30 rounded-full animate-[heroLoadBar_6s_infinite_linear]"></div>
-                </div>
-                <div className="w-16"></div>
-              </div>
-
-              {/* Main Content Area */}
-              <div className="flex-1 relative flex flex-col items-center justify-center p-6 bg-gradient-to-br from-[#111111] to-[#0a0a0a]">
-
-                {/* Scene 1: Resume Upload & AI Parsing */}
-                <div className="absolute w-24 h-32 bg-white/[0.03] border border-white/10 rounded-lg top-1/2 left-1/2 flex flex-col gap-2.5 p-3 opacity-0 animate-[heroResumePulse_6s_infinite_cubic-bezier(0.25,1,0.5,1)] z-10 pointer-events-none shadow-2xl backdrop-blur-sm">
-                  {/* Resume Lines */}
-                  <div className="w-1/2 h-2 bg-emerald-500/50 rounded-full mb-1"></div>
-                  <div className="w-full h-1.5 bg-white/20 rounded-full"></div>
-                  <div className="w-full h-1.5 bg-white/20 rounded-full"></div>
-                  <div className="w-4/5 h-1.5 bg-white/20 rounded-full"></div>
-                  <div className="mt-auto w-full h-8 bg-white/5 rounded block border border-white/10"></div>
-
-                  {/* Scanning Rings Overlay */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-emerald-500/40 animate-[heroAiPulse_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_25px_#10b981] animate-[heroPulseCenter_6s_infinite_cubic-bezier(0.25,1,0.5,1)]"></div>
-                </div>
-
-                {/* Scene 2: Portfolio UI Build - Fades In */}
-                <div className="w-full h-full flex flex-col gap-4 animate-[heroUiFadeIn_6s_infinite_cubic-bezier(0.25,1,0.5,1)] relative z-20 opacity-0">
-                  {/* Portfolio Hero Skeleton */}
-                  <div className="w-full h-24 bg-white/5 rounded-xl border border-white/5 flex flex-col items-center justify-center gap-3 p-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20"></div>
-                    <div className="w-1/3 h-2.5 bg-white/20 rounded-full"></div>
-                    <div className="w-1/2 h-2 bg-white/10 rounded-full"></div>
-                  </div>
-
-                  {/* Portfolio Body Grid */}
-                  <div className="flex flex-1 gap-4">
-                    {/* Sidebar Skeleton */}
-                    <div className="w-1/3 h-full bg-white/5 rounded-xl border border-white/5 p-3 flex flex-col gap-2">
-                      <div className="w-full h-2 bg-white/10 rounded-full mb-2"></div>
-                      <div className="w-3/4 h-1.5 bg-white/5 rounded-full"></div>
-                      <div className="w-5/6 h-1.5 bg-white/5 rounded-full"></div>
-                      <div className="w-2/3 h-1.5 bg-white/5 rounded-full"></div>
-                    </div>
-                    {/* Projects Grid Skeleton */}
-                    <div className="flex-1 h-full flex flex-col gap-3">
-                      <div className="flex gap-3 h-1/2">
-                        <div className="flex-1 bg-white/5 rounded-xl border border-white/5 relative overflow-hidden">
-                          <div className="absolute top-2 left-2 w-1/2 h-1.5 bg-white/10 rounded-full"></div>
-                        </div>
-                        <div className="flex-1 bg-emerald-500/5 border border-emerald-500/10 rounded-xl relative overflow-hidden shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]">
-                          <div className="absolute top-2 left-2 w-1/2 h-1.5 bg-emerald-500/30 rounded-full"></div>
-                        </div>
-                      </div>
-                      <div className="flex-1 bg-white/5 rounded-xl border border-white/5 relative overflow-hidden">
-                        <div className="absolute right-0 bottom-0 w-16 h-16 bg-emerald-500/10 rounded-tl-full blur-md"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Scene 3: Success Toast Popup */}
-                <div className="absolute bottom-6 left-1/2 backdrop-blur-md bg-[#132a21]/90 border border-emerald-500/30 rounded-full px-4 py-2 flex items-center gap-2 z-30 animate-[heroToastPop_6s_infinite_cubic-bezier(0.25,1,0.5,1)] shadow-[0_10px_30px_rgba(16,185,129,0.15)] opacity-0">
-                  <div className="w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center">
-                    <Check className="w-2 h-2 text-[#0c0c0c]" strokeWidth={4} />
-                  </div>
-                  <span className="text-emerald-400 text-[11px] font-bold tracking-wide uppercase">Portfolio Ready</span>
-                </div>
-              </div>
-            </div>
+          <div className="flex-[1.2] w-full max-w-2xl mx-auto lg:max-w-none relative">
+            <HeroBrowserAnimation />
           </div>
         </section>
 
@@ -417,43 +312,46 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* 4. Expert Exports (5/12) */}
-            <div className="md:col-span-12 lg:col-span-5 bg-background p-10 rounded-[2.5rem] shadow-sm border border-border group overflow-hidden flex flex-col relative min-h-[400px]">
+            {/* 4. Interaction Alerts (5/12) */}
+            <div className="md:col-span-12 lg:col-span-5 bg-background p-10 rounded-[2.5rem] shadow-sm border border-border group overflow-hidden flex flex-col relative min-h-[440px]">
               <div className="relative z-10">
                 <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center mb-6 border border-orange-100 transition-transform group-hover:-rotate-6">
-                  <Share className="w-6 h-6" />
+                  <Bell className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-extrabold mb-4">Expert Exports</h3>
+                <h3 className="text-2xl font-extrabold mb-4">Interaction Alerts</h3>
                 <p className="text-text-secondary leading-relaxed mb-6">
-                  One-click export to high-fidelity PDF, Figma, or professional resumes.
+                  Know exactly when opportunity knocks. Get instant notifications when recruiters interact with your portfolio.
                 </p>
               </div>
 
-              {/* Simulation: Transformation Chamber */}
-              <div className="mt-auto relative h-52 w-full bg-background-tertiary/20 rounded-[2.5rem] border border-border flex flex-col items-center justify-center overflow-hidden">
-                {/* Transformation Zone */}
-                <div className="relative w-48 h-32 flex items-center justify-center">
-                  {/* The "File" moving through */}
-                  <div className="absolute w-24 h-32 bg-white rounded-lg shadow-2xl border border-orange-100/50 flex flex-col p-4 gap-2 animate-file-slide">
-                    <div className="w-full h-2 bg-orange-100 rounded"></div>
-                    <div className="w-3/4 h-2 bg-orange-50 rounded"></div>
-                    <div className="mt-auto flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-sm bg-orange-500"></div>
-                      <div className="w-8 h-1.5 bg-orange-100 rounded"></div>
+              {/* Stacking Notification Feed */}
+              <div className="mt-auto relative h-[280px] w-full bg-background-tertiary/20 rounded-[2.5rem] border border-border p-6 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>
+
+                <div className="relative h-full">
+                  {[
+                    { text: "Someone viewed your Portfolio...", icon: User, delay: "0s", color: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+                    { text: "Resume downloaded by Someone", icon: Download, delay: "2s", color: "text-blue-500", bg: "bg-blue-500/10", border: "border-blue-500/20" },
+                    { text: "LinkedIn Profile click detected from your bio", icon: Link2, delay: "4s", color: "text-indigo-500", bg: "bg-indigo-500/10", border: "border-indigo-500/20" },
+                    { text: "Contact Form submission received", icon: MessageSquare, delay: "6s", color: "text-purple-500", bg: "bg-purple-500/10", border: "border-purple-500/20" }
+                  ].map((note, i) => (
+                    <div 
+                      key={i} 
+                      className="animate-notification-stack absolute top-0 left-0 right-0 bg-background rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.04)] border border-border flex items-center gap-4 transition-colors duration-500"
+                      style={{ 
+                        animationDelay: note.delay 
+                      }}
+                    >
+                      <div className={`w-10 h-10 ${note.bg} rounded-xl flex items-center justify-center ${note.color} border ${note.border}`}>
+                        <note.icon className="w-5 h-5" strokeWidth={2.5} />
+                      </div>
+                      <div className="flex-1 min-w-0 text-left">
+                        <div className="text-[12px] font-extrabold truncate">{note.text}</div>
+                        <div className="text-[10px] text-text-muted font-medium">Just now</div>
+                      </div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                     </div>
-                  </div>
-
-                  {/* Scanning Beam */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-orange-500/20 to-transparent w-full h-[200%] animate-scan-beam pointer-events-none">
-                    <div className="w-full h-[2px] bg-orange-500 shadow-[0_0_15px_#f97316]"></div>
-                  </div>
-                </div>
-
-                {/* Export Formats (Bottom) */}
-                <div className="absolute bottom-4 flex gap-4">
-                  <div className="px-3 py-1 bg-white rounded-lg shadow-sm border border-border text-[10px] font-bold text-rose-500">.PDF</div>
-                  <div className="px-3 py-1 bg-white rounded-lg shadow-sm border border-border text-[10px] font-bold text-indigo-500">.FIG</div>
-                  <div className="px-3 py-1 bg-white rounded-lg shadow-sm border border-border text-[10px] font-bold text-emerald-500">.DOCX</div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -567,179 +465,29 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── How it Works Section ── */}
-        <section id="how-it-works" className="pt-16 pb-24 scroll-mt-32">
+        {/* ── Full Demo Section ── */}
+        <section id="see-it-in-action" className="pt-16 pb-24 scroll-mt-32">
           <div className="text-center mb-16 relative">
-
             <h2
               style={{ fontFamily: "var(--font-display)" }}
               className="text-4xl md:text-5xl font-extrabold tracking-tight text-text mb-4"
             >
-              How it works in <span className="text-emerald-500 italic font-medium">3 steps.</span>
+              See <span className="inline-block px-4 py-1 border border-emerald-500/20 bg-emerald-500/5 rounded-2xl shadow-[0_0_15px_rgba(16,185,129,0.05)] -rotate-1 transform transition-transform hover:rotate-0">Shortlist<span className="text-emerald-500">Me</span></span> <span className="text-emerald-500 italic font-medium">in action.</span>
             </h2>
             <p className="text-text-secondary text-lg max-w-xl mx-auto">
-              Go from zero to a professional portfolio in three simple steps.
+              Ready in seconds. Experience how our AI transforms your career.
             </p>
           </div>
 
-          <div className="bg-background rounded-[2rem] p-4 sm:p-8 md:p-12 shadow-sm border border-border flex flex-col lg:flex-row items-center gap-12 overflow-hidden">
-            {/* Steps List (Left) */}
-            <div className="w-full lg:w-[400px] flex flex-col gap-4">
-              {[
-                {
-                  id: 1,
-                  title: "Upload Resume",
-                  desc: "Our AI parses your experience to create a baseline profile instantly.",
-                },
-                {
-                  id: 2,
-                  title: "Customize Design",
-                  desc: "Pick layouts and colors that match your professional brand.",
-                },
-                {
-                  id: 3,
-                  title: "Share URL",
-                  desc: "Launch your portfolio and share your unique link with the world.",
-                },
-              ].map((step) => {
-                const isActive = activeStep === step.id;
-                return (
-                  <div
-                    key={step.id}
-                    onClick={() => handleStepClick(step.id)}
-                    className={`p-6 rounded-2xl cursor-pointer transition-all border relative overflow-hidden ${isActive
-                      ? "bg-primary-light/30 border-primary/20 shadow-sm"
-                      : "bg-transparent border-transparent hover:bg-background-secondary"
-                      } flex gap-5`}
-                  >
-                    {/* Progress Bar (Only active) */}
-                    {isActive && (
-                      <div
-                        className="absolute bottom-0 left-0 h-1 bg-primary/20 transition-all duration-100 ease-linear"
-                        style={{ width: `${progress}%` }}
-                      ></div>
-                    )}
-
-                    <div
-                      className={`w-8 h-8 rounded-full flex shrink-0 items-center justify-center font-bold text-sm transition-colors ${isActive
-                        ? "bg-primary text-white"
-                        : "bg-background-tertiary text-text-secondary"
-                        }`}
-                    >
-                      {step.id}
-                    </div>
-                    <div>
-                      <h4 className={`text-lg font-bold mb-1 transition-colors ${isActive ? "text-text" : "text-text-secondary"}`}>
-                        {step.title}
-                      </h4>
-                      <p className={`text-sm leading-relaxed transition-colors ${isActive ? "text-text-secondary" : "text-text-muted"}`}>
-                        {step.desc}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Visual Canvas (Right) - Video Simulation */}
-            <div className="flex-1 w-full bg-text rounded-[2rem] p-4 shadow-2xl border border-border-strong/10 flex flex-col h-[400px] md:h-[500px] relative overflow-hidden group">
-              {/* Fake Player UI */}
-              <div className="absolute top-6 left-6 flex gap-2 z-20">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
-              </div>
-
-              <div className="absolute top-6 right-6 px-3 py-1 bg-white/10 backdrop-blur-md rounded-lg text-[10px] font-bold text-white/50 z-20 uppercase tracking-widest">
-                Real-time Preview
-              </div>
-
-              {/* Main Visual Content */}
-              <div className="flex-1 rounded-xl bg-background-tertiary/5 border border-border/50 relative mt-8 overflow-hidden flex items-center justify-center p-8 min-h-[360px]">
-                {activeStep === 1 && (
-                  <div className="animate-fade-up flex flex-col items-center w-full max-w-sm">
-                    {/* Cool Scanning Resume Mockup */}
-                    <div className="relative w-40 h-52 bg-[#0c0c0c] rounded-xl shadow-2xl border border-white/10 p-4 flex flex-col gap-3 overflow-hidden mb-8 transform hover:scale-105 transition-transform duration-500">
-                      <div className="w-1/2 h-2.5 bg-white/20 rounded mb-2"></div>
-                      <div className="w-full h-1.5 bg-white/10 rounded"></div>
-                      <div className="w-full h-1.5 bg-white/10 rounded"></div>
-                      <div className="w-5/6 h-1.5 bg-white/10 rounded"></div>
-                      <div className="w-3/4 h-1.5 bg-white/10 rounded mb-4"></div>
-                      <div className="w-full flex-1 bg-white/5 border border-white/5 rounded"></div>
-                      {/* Scanner Beam */}
-                      <div className="absolute top-0 left-0 right-0 h-1.5 bg-emerald-500 shadow-[0_0_20px_#10b981] animate-[igScanner_3s_infinite_linear]"></div>
-                    </div>
-                    <div className="w-full max-w-xs h-1.5 bg-background-tertiary rounded-full overflow-hidden mb-4">
-                      <div className="h-full bg-emerald-500 transition-all duration-100 shadow-[0_0_10px_#10b981]" style={{ width: `${progress}%` }}></div>
-                    </div>
-                    <p className="text-[10px] text-text-muted font-bold tracking-[0.2em] uppercase">Extracting 47 Data Points...</p>
-                  </div>
-                )}
-
-                {activeStep === 2 && (
-                  <div className="animate-fade-up w-full max-w-md h-full flex flex-col justify-center gap-6">
-                    {/* Fake Editor Top Bar */}
-                    <div className="flex gap-4 items-center justify-center">
-                      <div className="px-4 py-2 bg-background-tertiary border border-border rounded-lg text-xs font-bold text-text-secondary cursor-pointer hover:bg-border transition-colors">Classic</div>
-                      <div className="px-4 py-2 bg-emerald-500 text-background border border-emerald-500 rounded-lg text-xs font-black tracking-wide shadow-lg shadow-emerald-500/20 cursor-default">Modern Dark</div>
-                      <div className="px-4 py-2 bg-background-tertiary border border-border rounded-lg text-xs font-bold text-text-secondary cursor-pointer hover:bg-border transition-colors">Minimal</div>
-                    </div>
-                    {/* Fake Output Portfolio */}
-                    <div className="flex-1 bg-[#0a0a0a] rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col p-5 relative">
-                      <div className="flex justify-between items-center mb-5 pb-5 border-b border-white/10">
-                        <div className="w-6 h-6 rounded bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-[8px] font-black tracking-tighter">&lt;/&gt;</div>
-                        <div className="w-24 h-1.5 bg-white/20 rounded-full"></div>
-                      </div>
-                      <div className="w-3/4 h-5 bg-white/20 rounded mb-3"></div>
-                      <div className="w-1/2 h-2 bg-white/10 rounded mb-8"></div>
-                      <div className="flex gap-3">
-                        <div className="flex-1 h-28 bg-white/5 border border-white/5 rounded-xl"></div>
-                        <div className="flex-1 h-28 bg-white/5 border border-white/5 rounded-xl"></div>
-                      </div>
-                      {/* Overlaying Glowing Mouse Cursor */}
-                      <div className="absolute top-[60%] left-[40%] w-6 h-6 text-white" style={{ filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.5))" }}>
-                        <svg viewBox="0 0 24 24" fill="white" stroke="black" strokeWidth="1.5" className="w-6 h-6 animate-pulse"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.42a.5.5 0 0 0 .35-.85L5.5 3.21z" /></svg>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeStep === 3 && (
-                  <div className="animate-fade-up w-full max-w-md flex flex-col items-center justify-center gap-8">
-                    <div className="relative w-full">
-                      {/* Blooming Success Ring */}
-                      <div className="absolute inset-0 bg-emerald-500/10 rounded-[2rem] blur-xl"></div>
-
-                      <div className="bg-[#0a0a0a] border border-emerald-500/30 p-5 rounded-[2rem] flex items-center gap-5 relative z-10 shadow-2xl">
-                        <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 shrink-0 border border-emerald-500/20">
-                          <Globe className="w-6 h-6" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[10px] text-white/40 font-bold tracking-widest uppercase mb-1">Your Live Domain</div>
-                          <div className="text-white font-medium truncate text-lg">shortlistme.site/<span className="text-emerald-500 font-bold">tushar</span></div>
-                        </div>
-                        <div className="bg-emerald-500 text-background font-bold text-xs px-5 py-3 rounded-xl cursor-default flex items-center gap-2 shrink-0">
-                          <Copy className="w-4 h-4" /> Copy
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[11px] font-black tracking-widest uppercase shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-                      <CheckCircle className="w-4 h-4" /> Successfully Deployed
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Fake Video Timeline */}
-              <div className="h-1 w-full bg-white/5 mt-auto relative">
-                <div
-                  className="h-full bg-primary absolute left-0 top-0 transition-all duration-100 ease-linear"
-                  style={{
-                    width: `${((activeStep - 1) * 33.33) + (progress / 3)}%`
-                  }}
-                ></div>
-              </div>
+          <div className="bg-background rounded-[3rem] p-6 md:p-8 shadow-sm border border-border flex flex-col items-center overflow-hidden">
+            <div className="w-full max-w-5xl aspect-video rounded-[2rem] bg-black border border-white/5 shadow-2xl overflow-hidden relative group">
+              <iframe
+                src="https://player.cloudinary.com/embed/?cloud_name=dkdhdiqy0&public_id=short_lu3hor&autoplay=true&muted=true&loop=true&player[show_logo]=false&player[skin]=minimal&player[controls]=false"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full border-0"
+                title="ShortlistMe Demo Video"
+              ></iframe>
             </div>
           </div>
         </section>

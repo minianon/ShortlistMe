@@ -626,6 +626,23 @@ div.theme-mockup-sync {
   animation: spotlightGlow 4s infinite ease-in-out;
 }
 
+@keyframes notificationStack {
+  0% { transform: translateY(20px) translateX(0) scale(0.9); opacity: 0; filter: blur(4px); }
+  /* Position 1: Arrive at top */
+  5%, 20% { transform: translateY(0) translateX(0) scale(1); opacity: 1; filter: blur(0); }
+  /* Position 2: Push down once */
+  25%, 45% { transform: translateY(72px) translateX(2px) scale(0.96); opacity: 0.8; filter: blur(0.5px); }
+  /* Position 3: Push down twice */
+  50%, 70% { transform: translateY(144px) translateX(4px) scale(0.92); opacity: 0.4; filter: blur(1px); }
+  /* Exit */
+  75%, 100% { transform: translateY(180px) translateX(8px) scale(0.85); opacity: 0; filter: blur(8px); }
+}
+
+.animate-notification-stack {
+  animation: notificationStack 8s infinite cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
 /* ── SaaS Pipeline 5-Scene Animation ── */
 
 @keyframes saasResumeFade {
