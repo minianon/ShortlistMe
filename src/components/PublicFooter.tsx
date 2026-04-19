@@ -34,7 +34,7 @@ export default function PublicFooter({
     <>
       {/* ── Footer ── */}
       <footer 
-        className={`border-t py-16 ${!backgroundColor ? "bg-background-secondary border-border" : ""}`}
+        className={`border-t py-10 ${!backgroundColor ? "bg-background-secondary border-border" : ""}`}
         style={footerStyle}
       >
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-10">

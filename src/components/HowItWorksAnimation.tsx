@@ -154,7 +154,7 @@ export default function HowItWorksAnimation() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-[8px] text-white/40 font-bold tracking-[.3em] uppercase mb-2">Live Portal</div>
-                      <div className="text-base md:text-lg text-white font-black break-all md:break-normal">shortlistme.vercel.app/<span className="text-emerald-500 underline decoration-2 underline-offset-4">tushar</span></div>
+                      <div className="text-base md:text-lg text-white font-black break-all md:break-normal">shortlistme.site/<span className="text-emerald-500 underline decoration-2 underline-offset-4">tushar</span></div>
                     </div>
                   </div>
                 </div>
