@@ -16,22 +16,27 @@ graph TD
         Dashboard[User Dashboard]
         Editor[Portfolio Editor]
         PublicView[Public Portfolio Renderer]
+        Onboard[Onboarding Guide]
+        AnalyticsUI[Analytics Dashboard]
     end
 
     subgraph API ["API Layer (Serverless)"]
         Auth["Clerk Auth"]
         UploadAPI["/api/resume/upload"]
         GenAPI["/api/portfolio/generate"]
+        AnalyticsAPI["/api/analytics/*"]
         PublicAPI["/api/portfolio/publish"]
     end
 
     subgraph AI ["AI & Processing"]
-        Parser["PDF.js Text & Link Extractor"]
-        Groq["Groq AI - LLM Extraction"]
+        Parser["pdfjs-dist Text/Link Extractor"]
+        Groq["Groq AI - Llama 3.3/3.1"]
     end
 
     User --> Auth
     Auth --> Dashboard
+    Dashboard --> Onboard
+    Dashboard --> AnalyticsUI
     Dashboard --> UploadAPI
     UploadAPI --> Bucket
     Dashboard --> GenAPI
@@ -39,6 +44,8 @@ graph TD
     Parser --> Groq
     Groq --> Store
     PublicView --> Store
+    AnalyticsUI --> AnalyticsAPI
+    AnalyticsAPI --> Store
 ```
 
 ## Core Components
@@ -53,13 +60,14 @@ graph TD
 - **Storage**: Supabase Buckets for hosting original PDF resume files.
 
 ### 3. AI Pipeline
-- **Orchestration**: Next.js Server Actions and API Routes.
-- **Extraction**: `pdfjs-dist` for extracting raw text and embedded metadata (links).
-- **Inference**: Groq (Llama-3/Mixtral) for converting raw resume text into structured Portfolio JSON.
+- **Orchestration**: Next.js API Routes (`/api/portfolio/generate`).
+- **Extraction**: `pdfjs-dist` for extracting raw text and scanning the annotation layer for embedded metadata (hyperlinks).
+- **Inference**: Groq leveraging **Llama-3.3-70b** (primary) and **Llama-3.1-8b** (fallback/utility) for structured JSON mapping.
 
-### 4. Rendering Engine
-- **Dashboard**: A React-based command center for managing resumes and portfolios.
-- **Portfolio Renderer**: A high-performance, SEO-optimized page that renders JSON data into beautiful UI themes.
+### 4. Rendering & Client Systems
+- **Onboarding**: A multi-phase tour powered by `intro.js` that guides users through Dashboard, Studio, and Analytics.
+- **Interactions**: Real-time event tracking for views and clicks, persisted via specialized analytics endpoints.
+- **Portfolio Renderer**: SEO-optimized pages that dynamically map JSON data into premium UI themes.
 
 ## Data Flow (Resume to Portfolio)
 1. **Upload**: User uploads PDF -> API saves to Supabase Storage -> Prisma records Resume metadata.
