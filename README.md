@@ -31,10 +31,11 @@ Most people find it hard to create a professional portfolio. You have to worry a
 ## Key Features
 
 ### The Experience
-- **AI-Powered Extraction**: Upload a PDF, and our AI (Groq + Llama-3) extracts every detail, from your job history to hidden links in your resume.
+- **AI-Powered Extraction**: Upload a PDF, and our AI extracts every detail, from your job history to hidden links.
+- **Onboarding Tour**: A guided, premium walkthrough for new users to get them from zero to public portfolio in minutes.
 - **Instant Deployment**: Your portfolio is live the moment you click generate.
-- **Interactive Analytics**: See exactly how many people are viewing your portfolio and which of your project links they are clicking.
-- **Smart Notifications**: Get notified when you reach a new milestone or high engagement.
+- **Interactive Analytics**: Track real-time engagement, unique visits, and project link clicks.
+- **Smart Notifications**: Get notified of engagement milestones and system updates.
 
 ### Customization
 - **Theme Selection**: Choose from a library of premium, high-contrast themes optimized for readability.
@@ -50,7 +51,7 @@ Built with a high-performance modern stack for speed and reliability:
 - **Framework**: [Next.js](https://nextjs.org/) (App Router, Turbopack)
 - **Authentication**: [Clerk](https://clerk.com/)
 - **Database**: [Prisma](https://www.prisma.io/) with [PostgreSQL](https://www.postgresql.org/)
-- **AI Intelligence**: [Groq Cloud](https://groq.com/) (Ultra-fast inference)
+- **AI Intelligence**: [Groq Cloud](https://groq.com/) (Llama 3.1/3.3)
 - **PDF Engine**: [PDF.js](https://mozilla.github.io/pdf.js/)
 - **Infrastructure**: [Vercel](https://vercel.com/) & [Supabase](https://supabase.com/)
 
@@ -92,6 +93,7 @@ src/
 
 4. **Initialize Database**
    ```bash
+   npx prisma db push
    npm run prisma:generate
    ```
 
