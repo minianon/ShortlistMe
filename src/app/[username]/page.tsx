@@ -10,6 +10,7 @@ import { recordVisit } from "@/lib/analytics";
 import PortfolioRenderer from "@/components/portfolio/PortfolioRenderer";
 import { PortfolioData, getThemeStyles } from "@/lib/portfolio-utils";
 import MadeWithShortlistMe from "@/components/MadeWithShortlistMe";
+import { SITE_URL } from "@/lib/site";
 import VisibilityToggle from "@/components/portfolio/VisibilityToggle";
 
 // ── Metadata ─────────────────────────────────────────────────────────────────
@@ -20,20 +21,50 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
+  const slug = username.toLowerCase();
   const portfolio = await prisma.portfolio.findUnique({
-    where: { slug: username.toLowerCase() },
+    where: { slug },
     select: { isPublic: true, publishedVersion: { select: { data: true } } },
   });
   const data = (portfolio?.publishedVersion?.data ?? {}) as unknown as PortfolioData;
   const name = data.name ?? username;
   const icon = data.photoUrl || "/icon.svg";
+  const live = Boolean(portfolio?.isPublic && portfolio.publishedVersion);
+  const title = data.title ? `${name} — ${data.title}` : `${name} — Portfolio`;
+  const description = data.bio ?? `Professional portfolio of ${name} — powered by ShortlistMe`;
 
   return {
-    title: `${name} — Portfolio`,
-    description: data.bio ?? `Professional portfolio of ${name} — powered by ShortlistMe`,
+    title,
+    description,
     icons: {
       icon: icon,
       apple: icon,
+    },
+    alternates: { canonical: `/${slug}` },
+    /* Unclaimed and private portfolios are not real pages for anyone searching — keep them out of the index. */
+    robots: live ? { index: true, follow: true } : { index: false, follow: false },
+    openGraph: live
+      ? { type: "profile", url: `/${slug}`, title, description, ...(data.photoUrl ? { images: [{ url: data.photoUrl }] } : {}) }
+      : undefined,
+    twitter: live ? { card: "summary", title, description } : undefined,
+  };
+}
+
+/** Person structured data for a public portfolio. Only the name, headline and public profile links — never email or phone. */
+function personJsonLd(d: PortfolioData, slug: string) {
+  const sameAs = [d.linkedin, d.github, d.website, d.twitter].filter((u): u is string => typeof u === "string" && /^https?:\/\//.test(u));
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    url: `${SITE_URL}/${slug}`,
+    mainEntity: {
+      "@type": "Person",
+      name: d.name,
+      ...(d.title ? { jobTitle: d.title } : {}),
+      ...(d.bio ? { description: d.bio } : {}),
+      ...(d.photoUrl ? { image: d.photoUrl } : {}),
+      ...(d.skills?.length ? { knowsAbout: d.skills.slice(0, 20) } : {}),
+      ...(sameAs.length ? { sameAs } : {}),
     },
   };
 }
@@ -100,6 +131,9 @@ export default async function PublicPortfolioPage({
       className="min-h-screen flex flex-col font-sans transition-colors duration-300"
       style={{ backgroundColor: themeStyles.surface, color: themeStyles.text }}
     >
+      {d.name ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd(d, username.toLowerCase())) }} />
+      ) : null}
       <PortfolioRenderer data={d} portfolioId={portfolio.id} visitId={visit?.id} />
       <PublicFooter 
         primaryColor={themeStyles.primaryHex} 
