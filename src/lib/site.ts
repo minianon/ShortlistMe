@@ -1,5 +1,10 @@
-/** Canonical site details, shared by metadata, the sitemap, structured data and llms.txt. */
-export const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://shortlistme.site").replace(/\/+$/, "");
+/**
+ * Canonical site details, shared by metadata, the sitemap, structured data and llms.txt.
+ *
+ * A constant, not NEXT_PUBLIC_APP_URL: that variable is set to http://localhost:3000
+ * in Vercel, which put localhost into every canonical, sitemap entry and share card.
+ */
+export const SITE_URL = "https://shortlistme.site";
 export const SITE_NAME = "ShortlistMe";
 export const SITE_TAGLINE = "AI Portfolio Generator";
 export const SITE_DESCRIPTION =
