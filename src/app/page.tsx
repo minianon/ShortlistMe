@@ -6,6 +6,14 @@ import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
 import PublicFooter from "@/components/PublicFooter";
 import HeroBrowserAnimation from "@/components/HeroBrowserAnimation";
+import { FAQS } from "@/lib/site";
+
+/** The FAQ below as FAQPage structured data — same questions and answers as the visible section. */
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+};
 
 export default function HomePage() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
@@ -494,6 +502,7 @@ export default function HomePage() {
 
         {/* ── FAQ Section ── */}
         <section id="faq" className="pt-16 pb-24 max-w-3xl mx-auto relative px-6 md:px-0 scroll-mt-32">
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent"></div>
 
           <div className="text-center mb-16 relative">
@@ -510,28 +519,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-col gap-3">
-            {[
-              {
-                q: "How does the AI generate my portfolio?",
-                a: "Our proprietary AI engine analyzes your resume's structure, keywords, and work history. It then maps this data to a curated collection of high-fidelity design templates, automatically selecting layouts that best highlight your specific career strengths.",
-              },
-              {
-                q: "Is my resume data kept private?",
-                a: "Yes. Your data is encrypted and stored securely. We do not sell your personal information or use it to train public models.",
-              },
-              {
-                q: "Can I customize the design after generation?",
-                a: "Absolutely! The AI gives you a huge head start, but you have full control over colors, fonts, layouts, and individual project descriptions.",
-              },
-              {
-                q: "What formats can I export my portfolio in?",
-                a: "You can share the live web URL, export it as a clean PDF for email attachments, or pull it directly into Figma for expert-level pixel pushing.",
-              },
-              {
-                q: "Do I need design skills to use ShortlistMe?",
-                a: "Not at all. The platform is built specifically for non-designers to have top-tier, designer-quality portfolios instantly.",
-              },
-            ].map((faq, i) => {
+            {FAQS.map((faq, i) => {
               const isOpen = openFaqIndex === i;
               return (
                 <div
