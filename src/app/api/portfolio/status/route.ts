@@ -2,7 +2,7 @@ import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
-import Groq from "groq-sdk";
+import { chatJSON, fallbackModel } from "@/server/ai";
 
 // Helpers
 function slugify(text: string): string {
@@ -34,23 +34,19 @@ async function deriveInfoFromEmail(email?: string | null) {
 
   // If no delimiters, try a fast AI split (e.g., tradertushar -> Trader Tushar)
   try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+    const { first, last } = await chatJSON<{ first?: string; last?: string }>({
+      models: [fallbackModel()],
+      maxTokens: 512,
       messages: [
         { role: "system", content: "Split the input into professional First and Last names. Output JSON: {\"first\":\"\",\"last\":\"\"}. No extra text. If only one name is possible, put it in 'first'." },
         { role: "user", content: prefix }
       ],
-      response_format: { type: "json_object" },
-      temperature: 0.1,
     });
-    
-    const { first, last } = JSON.parse(completion.choices[0]?.message?.content || "{}");
     if (first) {
       return { 
         first: first.charAt(0).toUpperCase() + first.slice(1), 
         last: last ? last.charAt(0).toUpperCase() + last.slice(1) : "", 
-        full: `${first} ${last}`.trim(), 
+        full: `${first} ${last ?? ""}`.trim(), 
         slug: slugify(prefix),
         derived: true 
       };
