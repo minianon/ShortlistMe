@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { prisma } from "@/server/db";
 import { supabaseAdmin } from "@/server/supabase";
-import Groq from "groq-sdk";
+import { chatJSON, fallbackModel } from "@/server/ai";
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 
 // Extract text and hyperlinks from a PDF buffer
@@ -77,23 +77,19 @@ async function deriveInfoFromEmail(email?: string | null) {
   }
 
   try {
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+    const { first, last } = await chatJSON<{ first?: string; last?: string }>({
+      models: [fallbackModel()],
+      maxTokens: 512,
       messages: [
         { role: "system", content: "Split the input into professional First and Last names. Output JSON: {\"first\":\"\",\"last\":\"\"}. No extra text. If only one name is possible, put it in 'first'." },
         { role: "user", content: prefix }
       ],
-      response_format: { type: "json_object" },
-      temperature: 0.1,
     });
-    
-    const { first, last } = JSON.parse(completion.choices[0]?.message?.content || "{}");
     if (first) {
       return { 
         first: first.charAt(0).toUpperCase() + first.slice(1), 
         last: last ? last.charAt(0).toUpperCase() + last.slice(1) : "", 
-        full: `${first} ${last}`.trim(), 
+        full: `${first} ${last ?? ""}`.trim(), 
         slug: slugify(prefix),
         derived: true 
       };
@@ -122,9 +118,6 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized or session expired" }, { status: 401 });
     }
     
-    // Initialize Groq inside the handler to prevent top-level unhandled missing key crashes
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || "dummy" });
-
     // 1. Find the user and their latest resume
     const dbUser = await prisma.user.findUnique({
       where: { clerkUserId: userId },
@@ -220,34 +213,9 @@ ${resumeText.slice(0, 8000)}`;
 
     let portfolioData: Record<string, unknown>;
     try {
-      const model = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
-      const completion = await groq.chat.completions.create({
-        model,
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.2,
-        max_tokens: 2048,
-      });
-
-      const raw = completion.choices[0]?.message?.content ?? "";
-      // Strip any accidental markdown fences
-      const cleaned = raw.replace(/```(?:json)?/gi, "").replace(/```/g, "").trim();
-      portfolioData = JSON.parse(cleaned);
-    } catch {
-      // Fallback: try the smaller model
-      try {
-        const fallback = process.env.GROQ_FALLBACK_MODEL ?? "llama-3.1-8b-instant";
-        const completion2 = await groq.chat.completions.create({
-          model: fallback,
-          messages: [{ role: "user", content: prompt }],
-          temperature: 0.2,
-          max_tokens: 2048,
-        });
-        const raw2 = completion2.choices[0]?.message?.content ?? "";
-        const cleaned2 = raw2.replace(/```(?:json)?/gi, "").replace(/```/g, "").trim();
-        portfolioData = JSON.parse(cleaned2);
-      } catch (err2: any) {
-        return NextResponse.json({ error: "AI parsing failed. Please try again.", details: err2.message }, { status: 500 });
-      }
+      portfolioData = await chatJSON({ messages: [{ role: "user", content: prompt }], maxTokens: 6000 });
+    } catch (err: any) {
+      return NextResponse.json({ error: "AI parsing failed. Please try again.", details: err?.message }, { status: 500 });
     }
 
     // 5. Derive slug from claimed cookie, parsed name, or Clerk user name
